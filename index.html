@@ -304,6 +304,10 @@
 <!-- Jaar-tab -->
 <div id="tab-year" class="hidden">
   <h2>Jaaroverzicht</h2>
+<button id="resetYearOverridesBtn" class="btn-main" style="margin-bottom:14px;">
+  Reset jaar-overrides
+</button>
+
   <div class="year-nav">
     <button id="prevYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
     <div id="yearTitle" class="year-title"></div>
@@ -1121,6 +1125,26 @@ if(msAmountEl && msTypeEl){
 
   // Initial render
   renderCategories();
+// v81 – Reset alleen jaar-overrides (handmatige beginsaldi + maandelijkse spaaractie)
+var resetBtn = document.getElementById("resetYearOverridesBtn");
+if (resetBtn) {
+  resetBtn.onclick = function () {
+    var settings = loadSettings();
+
+    // Reset jaar-startwaarden
+    settings.yearStarting = {};
+    settings.yearBankStarting = {};
+    settings.yearMonthlySaving = {};
+
+    saveSettings(settings);
+
+    // Cache legen
+    yearCache = {};
+
+    alert("Jaar-overrides succesvol gereset.\nGa nu naar het gewenste jaar om opnieuw te berekenen.");
+    renderYear();
+  };
+}
 </script>
 
 
