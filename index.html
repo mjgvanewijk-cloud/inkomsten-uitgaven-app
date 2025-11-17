@@ -413,6 +413,9 @@
   }
   function saveSavings(d){try{localStorage.setItem(SAVINGS_KEY,JSON.stringify(d));}catch(e){}}
 
+// v79 – eenvoudige cache voor jaarberekeningen
+var yearCache = {};
+
   function loadSettings(){
     try{
       var r=localStorage.getItem(SETTINGS_KEY);
@@ -810,6 +813,10 @@ function isMonthClosed(year, monthIdx){
 
 // v74: bereken eindstand bank en spaarrekening voor een jaar
 function computeYearEndState(year){
+    // v79 caching – als dit jaar al eerder berekend is, gebruik die waarde
+    if (yearCache[year]) {
+        return yearCache[year];
+    }
   var settings = loadSettings();
   if(!settings.yearStarting){ settings.yearStarting = {}; }
   if(!settings.yearBankStarting){ settings.yearBankStarting = {}; }
@@ -841,11 +848,18 @@ function computeYearEndState(year){
 
   var spaarEind = start + cumDep - cumWdr;
 
-  return {
+      var result = {
     bankEnd: bank,
     savingEnd: spaarEind
-  };
+};
+
+
+    // v79 – resultaat cachen zodat jaar niet opnieuw foutief berekend wordt
+    yearCache[year] = result;
+
+    return result;
 }
+
 
 
 // v78 helpers voor correcte beginsaldi per jaar
