@@ -456,9 +456,15 @@
   }
 
   function changeYear(offset){
-    currentYear += offset;
+    var newYear = currentYear + offset;
+
+    // blokkeer ondergrens: nooit onder 1900
+    if(newYear < 1900){
+        return; // doe niks als je nog verder terug probeert
+    }
+
+    currentYear = newYear;
     renderYear();
-  }
 
   // Navigatieknoppen voor maand
 // Swipe-functionaliteit verwijderd voor v71
@@ -496,7 +502,7 @@
     document.getElementById("amountInput").value = c.amount || "";
     document.getElementById("typeInput").value = c.type || "income";
 
-    overlay.style.display="block";
+    overlay.style.display="block";[
     setTimeout(function(){sheet.classList.add("show");},10);
   }
   function closeSheet(){
