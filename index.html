@@ -848,6 +848,50 @@ function computeYearEndState(year){
 }
 
 
+// v78 helpers voor correcte beginsaldi per jaar
+
+function getEffectiveSavingStart(year) {
+    const settings = loadSettings();
+    const raw = settings.yearStarting && settings.yearStarting[year];
+
+    // 1) Handmatig ingevoerd?
+    if (raw != null && raw !== "") {
+        return Number(raw) || 0;
+    }
+
+    // 2) Anders: eind vorig jaar
+    const prevYear = year - 1;
+    if (prevYear >= 1900) {
+        const prevState = computeYearEndState(prevYear);
+        return prevState && prevState.savingEnd != null 
+            ? Number(prevState.savingEnd) || 0 
+            : 0;
+    }
+
+    return 0; // fallback eerste jaar
+}
+
+function getEffectiveBankStart(year) {
+    const settings = loadSettings();
+    const raw = settings.yearBankStarting && settings.yearBankStarting[year];
+
+    // 1) Handmatig ingevoerd?
+    if (raw != null && raw !== "") {
+        return Number(raw) || 0;
+    }
+
+    // 2) Anders: eind vorig jaar
+    const prevYear = year - 1;
+    if (prevYear >= 1900) {
+        const prevState = computeYearEndState(prevYear);
+        return prevState && prevState.bankEnd != null
+            ? Number(prevState.bankEnd) || 0
+            : 0;
+    }
+
+    return 0;
+}
+
   
   function renderYear(){
   var settings = loadSettings();
@@ -858,48 +902,15 @@ function computeYearEndState(year){
   var year = currentYear;
 
   // Spaar: beginsaldo
-  var baseSavingsStart = 0;
-  var start;
- // v77: beginsaldo spaarrekening correct bepalen
-if (settings.yearStarting[year] != null && settings.yearStarting[year] !== "") {
+  // v78 – correcte beginsaldo spaar via helper
+var start = getEffectiveSavingStart(year);
 
-    start = Number(settings.yearStarting[year]);       // door gebruiker ingevoerd
-} else {
-    var prevYear = year - 1;
-
-    if (prevYear >= 1900) {
-        // v77: zorg eerst dat vorig jaar correct berekend is
-        var prevState = computeYearEndState(prevYear);
-
-        // gebruik de echte eindejaars spaarstand
-        start = prevState.savingEnd != null ? prevState.savingEnd : 0;
-    } else {
-        start = baseSavingsStart;
-    }
-}
 
 
   // Bank: beginsaldo
-  var baseBankStart = 0;
-  var bankStart;
- // v77: beginsaldo bankrekening correct bepalen
-if (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "") {
+  // v78 – correcte beginsaldo bank via helper
+var bankStart = getEffectiveBankStart(year);
 
-    bankStart = Number(settings.yearBankStarting[year]);
-} else {
-    var prevY = year - 1;
-
-
-    if (prevY >= 1900) {
-        // v77: bereken vorig jaar volledig en consistent
-        var prevStateB = computeYearEndState(prevY);
-
-        // neem de echte eindejaars bankstand over
-        bankStart = prevStateB.bankEnd != null ? prevStateB.bankEnd : 0;
-    } else {
-        bankStart = baseBankStart;
-    }
-}
 
 
   // Titel
