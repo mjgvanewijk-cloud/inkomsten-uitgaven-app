@@ -815,26 +815,42 @@ function computeYearEndState(year){
   if(!settings.yearBankStarting){ settings.yearBankStarting = {}; }
   if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
 
-  // Spaar start
-  var baseSavingsStart = 0;
-  var start = (settings.yearStarting[year] != null)
-    ? Number(settings.yearStarting[year])
-    : baseSavingsStart;
+  // Spaar: beginsaldo (zelfde logica als in renderYear)
+  var start;
+  if (settings.yearStarting[year] != null && settings.yearStarting[year] !== "") {
+    start = Number(settings.yearStarting[year]);
+  } else {
+    var prevYear = year - 1;
+    if (prevYear >= 1900) {
+      var prevState = computeYearEndState(prevYear);
+      start = prevState.savingEnd || 0;
+    } else {
+      start = 0;
+    }
+  }
 
-  // Bank start
-  var baseBankStart = 0;
-  var bank = (settings.yearBankStarting[year] != null)
-    ? Number(settings.yearBankStarting[year])
-    : baseBankStart;
+  // Bank: beginsaldo (zelfde logica als in renderYear)
+  var bank;
+  if (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "") {
+    bank = Number(settings.yearBankStarting[year]);
+  } else {
+    var prevYearB = year - 1;
+    if (prevYearB >= 1900) {
+      var prevStateB = computeYearEndState(prevYearB);
+      bank = prevStateB.bankEnd || 0;
+    } else {
+      bank = 0;
+    }
+  }
 
   var cumDep = 0;
   var cumWdr = 0;
 
-  for(var m = 1; m <= 12; m++){
+  for (var m = 1; m <= 12; m++) {
     var t = computeMonthTotalsFor(year, m);
     cumDep += t.deposits;
     cumWdr += t.withdrawals;
-    bank   += t.available;
+    bank   += t.available; // beschikbaar al na spaaracties
   }
 
   var spaarEind = start + cumDep - cumWdr;
@@ -844,6 +860,7 @@ function computeYearEndState(year){
     savingEnd: spaarEind
   };
 }
+
 
 
   
