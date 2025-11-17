@@ -858,36 +858,44 @@ function computeYearEndState(year){
   // Spaar: beginsaldo
   var baseSavingsStart = 0;
   var start;
-  if(settings.yearStarting[year] != null){
-    start = Number(settings.yearStarting[year]);
-  } else {
-    // v74: als er geen expliciet beginsaldo is,
-    // gebruik dan spaar-eind van vorig jaar (indien beschikbaar)
+ // v77: beginsaldo spaarrekening correct bepalen
+if (settings.yearStarting[year] != null) {
+    start = Number(settings.yearStarting[year]);       // door gebruiker ingevoerd
+} else {
     var prevYear = year - 1;
-    if(prevYear >= 1900){
-      var prevState = computeYearEndState(prevYear);
-      start = prevState.savingEnd || 0;
+
+    if (prevYear >= 1900) {
+        // v77: zorg eerst dat vorig jaar correct berekend is
+        var prevState = computeYearEndState(prevYear);
+
+        // gebruik de echte eindejaars spaarstand
+        start = prevState.savingEnd != null ? prevState.savingEnd : 0;
     } else {
-      start = baseSavingsStart;
+        start = baseSavingsStart;
     }
-  }
+}
+
 
   // Bank: beginsaldo
   var baseBankStart = 0;
   var bankStart;
-  if(settings.yearBankStarting[year] != null){
-    bankStart = Number(settings.yearBankStarting[year]);
-  } else {
-    // v74: als er geen expliciet beginsaldo is,
-    // gebruik dan bank-eind van vorig jaar (indien beschikbaar)
-    var prevYearB = year - 1;
-    if(prevYearB >= 1900){
-      var prevStateB = computeYearEndState(prevYearB);
-      bankStart = prevStateB.bankEnd || 0;
+ // v77: beginsaldo bankrekening correct bepalen
+if (settings.yearBankStarting[y] != null) {
+    bankStart = Number(settings.yearBankStarting[y]);   // door gebruiker ingevoerd
+} else {
+    var prevY = y - 1;
+
+    if (prevY >= 1900) {
+        // v77: bereken vorig jaar volledig en consistent
+        var prevStateB = computeYearEndState(prevY);
+
+        // neem de echte eindejaars bankstand over
+        bankStart = prevStateB.bankEnd != null ? prevStateB.bankEnd : 0;
     } else {
-      bankStart = baseBankStart;
+        bankStart = baseBankStart;
     }
-  }
+}
+
 
   // Titel
   var yt = document.getElementById("yearTitle");
