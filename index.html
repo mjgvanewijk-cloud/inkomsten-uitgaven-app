@@ -792,23 +792,20 @@
   }
 
 
-// v74: bepaal of een maand "afgesloten" is
-// Een maand is afgesloten als:
-// - er maand-overrides zijn OF
-// - er spaaracties zijn
+// v76: een maand is alleen "afgesloten" als er spaaracties zijn
+// Categorie-overrides tellen NIET meer mee voor locken.
 function isMonthClosed(year, monthIdx){
   var mStr = String(monthIdx);
-  if(mStr.length === 1) mStr = "0" + mStr;
+  if (mStr.length === 1) mStr = "0" + mStr;
   var key = year + "-" + mStr;
 
-  var md = loadMonthData();
-  var s  = loadSavings();
+  var s = loadSavings();
+  var hasSavings = s[key] && s[key].length > 0;
 
-  var hasOverrides = md[key] && Object.keys(md[key]).length > 0;
-  var hasSavings   = s[key] && s[key].length > 0;
-
-  return !!(hasOverrides || hasSavings);
+  // Alleen spaaracties bepalen of de maand locked is
+  return !!hasSavings;
 }
+
 
 
 // v74: bereken eindstand bank en spaarrekening voor een jaar
