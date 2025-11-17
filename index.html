@@ -880,10 +880,11 @@ if (settings.yearStarting[year] != null) {
   var baseBankStart = 0;
   var bankStart;
  // v77: beginsaldo bankrekening correct bepalen
-if (settings.yearBankStarting[y] != null) {
-    bankStart = Number(settings.yearBankStarting[y]);   // door gebruiker ingevoerd
+if (settings.yearBankStarting[year] != null) {
+    bankStart = Number(settings.yearBankStarting[year]);
 } else {
-    var prevY = y - 1;
+    var prevY = year - 1;
+
 
     if (prevY >= 1900) {
         // v77: bereken vorig jaar volledig en consistent
