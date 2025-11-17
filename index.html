@@ -817,15 +817,17 @@ function computeYearEndState(year){
 
   // Spaar start
   var baseSavingsStart = 0;
-  var start = (settings.yearStarting[year] != null)
+  var start = (settings.yearStarting[year] != null && settings.yearStarting[year] !== "")
     ? Number(settings.yearStarting[year])
     : baseSavingsStart;
 
+
   // Bank start
   var baseBankStart = 0;
-  var bank = (settings.yearBankStarting[year] != null)
+  var bank = (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "")
     ? Number(settings.yearBankStarting[year])
     : baseBankStart;
+
 
   var cumDep = 0;
   var cumWdr = 0;
@@ -859,7 +861,8 @@ function computeYearEndState(year){
   var baseSavingsStart = 0;
   var start;
  // v77: beginsaldo spaarrekening correct bepalen
-if (settings.yearStarting[year] != null) {
+if (settings.yearStarting[year] != null && settings.yearStarting[year] !== "") {
+
     start = Number(settings.yearStarting[year]);       // door gebruiker ingevoerd
 } else {
     var prevYear = year - 1;
@@ -880,7 +883,8 @@ if (settings.yearStarting[year] != null) {
   var baseBankStart = 0;
   var bankStart;
  // v77: beginsaldo bankrekening correct bepalen
-if (settings.yearBankStarting[year] != null) {
+if (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "") {
+
     bankStart = Number(settings.yearBankStarting[year]);
 } else {
     var prevY = year - 1;
