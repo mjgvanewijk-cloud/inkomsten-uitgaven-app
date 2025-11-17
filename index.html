@@ -932,11 +932,27 @@ var bankStart = getEffectiveBankStart(year);
   if(yt){ yt.textContent = "Jaar: " + year; }
 
   // Invulvelden
+    // Invulvelden – v80 fix:
+  // UI gebruikt NOOIT oude localStorage-waardes als override.
+  // Alleen echte handmatige invoer (in dit jaar) telt.
   var startInput = document.getElementById("startingSavingsInput");
-  if(startInput){ startInput.value = start; }
+  if(startInput){
+    if(settings.yearStarting[year] !== undefined && settings.yearStarting[year] !== ""){
+      startInput.value = settings.yearStarting[year];
+    } else {
+      startInput.value = start; // automatisch doorrollen
+    }
+  }
 
   var bankInput = document.getElementById("startingBankInput");
-  if(bankInput){ bankInput.value = bankStart; }
+  if(bankInput){
+    if(settings.yearBankStarting[year] !== undefined && settings.yearBankStarting[year] !== ""){
+      bankInput.value = settings.yearBankStarting[year];
+    } else {
+      bankInput.value = bankStart; // automatisch doorrollen
+    }
+  }
+
 
   // Maandelijkse spaaractie invullen
   var ym = settings.yearMonthlySaving[year] || null;
