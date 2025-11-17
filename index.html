@@ -304,7 +304,6 @@
 <!-- Jaar-tab -->
 <div id="tab-year" class="hidden">
   <h2>Jaaroverzicht</h2>
-
   <div class="year-nav">
     <button id="prevYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
     <div id="yearTitle" class="year-title"></div>
@@ -330,9 +329,6 @@
 
   <button id="saveSettingsBtn">Instellingen opslaan</button>
 </div>
-<button id="resetYearOverridesBtn" class="btn-main" style="margin-top:10px; background:#9b1d2e;">
-  Reset jaar-overrides
-</button>
 
 
   <div class="card">
@@ -416,9 +412,6 @@
     return {};
   }
   function saveSavings(d){try{localStorage.setItem(SAVINGS_KEY,JSON.stringify(d));}catch(e){}}
-
-// v79 – eenvoudige cache voor jaarberekeningen
-var yearCache = {};
 
   function loadSettings(){
     try{
@@ -799,28 +792,27 @@ var yearCache = {};
   }
 
 
-// v76: een maand is alleen "afgesloten" als er spaaracties zijn
-// Categorie-overrides tellen NIET meer mee voor locken.
+// v74: bepaal of een maand "afgesloten" is
+// Een maand is afgesloten als:
+// - er maand-overrides zijn OF
+// - er spaaracties zijn
 function isMonthClosed(year, monthIdx){
   var mStr = String(monthIdx);
-  if (mStr.length === 1) mStr = "0" + mStr;
+  if(mStr.length === 1) mStr = "0" + mStr;
   var key = year + "-" + mStr;
 
-  var s = loadSavings();
-  var hasSavings = s[key] && s[key].length > 0;
+  var md = loadMonthData();
+  var s  = loadSavings();
 
-  // Alleen spaaracties bepalen of de maand locked is
-  return !!hasSavings;
+  var hasOverrides = md[key] && Object.keys(md[key]).length > 0;
+  var hasSavings   = s[key] && s[key].length > 0;
+
+  return !!(hasOverrides || hasSavings);
 }
-
 
 
 // v74: bereken eindstand bank en spaarrekening voor een jaar
 function computeYearEndState(year){
-    // v79 caching – als dit jaar al eerder berekend is, gebruik die waarde
-    if (yearCache[year]) {
-        return yearCache[year];
-    }
   var settings = loadSettings();
   if(!settings.yearStarting){ settings.yearStarting = {}; }
   if(!settings.yearBankStarting){ settings.yearBankStarting = {}; }
@@ -828,17 +820,15 @@ function computeYearEndState(year){
 
   // Spaar start
   var baseSavingsStart = 0;
-  var start = (settings.yearStarting[year] != null && settings.yearStarting[year] !== "")
+  var start = (settings.yearStarting[year] != null)
     ? Number(settings.yearStarting[year])
     : baseSavingsStart;
 
-
   // Bank start
   var baseBankStart = 0;
-  var bank = (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "")
+  var bank = (settings.yearBankStarting[year] != null)
     ? Number(settings.yearBankStarting[year])
     : baseBankStart;
-
 
   var cumDep = 0;
   var cumWdr = 0;
@@ -852,63 +842,12 @@ function computeYearEndState(year){
 
   var spaarEind = start + cumDep - cumWdr;
 
-      var result = {
+  return {
     bankEnd: bank,
     savingEnd: spaarEind
-};
-
-
-    // v79 – resultaat cachen zodat jaar niet opnieuw foutief berekend wordt
-    yearCache[year] = result;
-
-    return result;
+  };
 }
 
-
-
-// v78 helpers voor correcte beginsaldi per jaar
-
-function getEffectiveSavingStart(year) {
-    const settings = loadSettings();
-    const raw = settings.yearStarting && settings.yearStarting[year];
-
-    // 1) Handmatig ingevoerd?
-    if (raw != null && raw !== "") {
-        return Number(raw) || 0;
-    }
-
-    // 2) Anders: eind vorig jaar
-    const prevYear = year - 1;
-    if (prevYear >= 1900) {
-        const prevState = computeYearEndState(prevYear);
-        return prevState && prevState.savingEnd != null 
-            ? Number(prevState.savingEnd) || 0 
-            : 0;
-    }
-
-    return 0; // fallback eerste jaar
-}
-
-function getEffectiveBankStart(year) {
-    const settings = loadSettings();
-    const raw = settings.yearBankStarting && settings.yearBankStarting[year];
-
-    // 1) Handmatig ingevoerd?
-    if (raw != null && raw !== "") {
-        return Number(raw) || 0;
-    }
-
-    // 2) Anders: eind vorig jaar
-    const prevYear = year - 1;
-    if (prevYear >= 1900) {
-        const prevState = computeYearEndState(prevYear);
-        return prevState && prevState.bankEnd != null
-            ? Number(prevState.bankEnd) || 0
-            : 0;
-    }
-
-    return 0;
-}
 
   
   function renderYear(){
@@ -920,43 +859,49 @@ function getEffectiveBankStart(year) {
   var year = currentYear;
 
   // Spaar: beginsaldo
-  // v78 – correcte beginsaldo spaar via helper
-var start = getEffectiveSavingStart(year);
-
-
+  var baseSavingsStart = 0;
+  var start;
+  if(settings.yearStarting[year] != null){
+    start = Number(settings.yearStarting[year]);
+  } else {
+    // v74: als er geen expliciet beginsaldo is,
+    // gebruik dan spaar-eind van vorig jaar (indien beschikbaar)
+    var prevYear = year - 1;
+    if(prevYear >= 1900){
+      var prevState = computeYearEndState(prevYear);
+      start = prevState.savingEnd || 0;
+    } else {
+      start = baseSavingsStart;
+    }
+  }
 
   // Bank: beginsaldo
-  // v78 – correcte beginsaldo bank via helper
-var bankStart = getEffectiveBankStart(year);
-
-
+  var baseBankStart = 0;
+  var bankStart;
+  if(settings.yearBankStarting[year] != null){
+    bankStart = Number(settings.yearBankStarting[year]);
+  } else {
+    // v74: als er geen expliciet beginsaldo is,
+    // gebruik dan bank-eind van vorig jaar (indien beschikbaar)
+    var prevYearB = year - 1;
+    if(prevYearB >= 1900){
+      var prevStateB = computeYearEndState(prevYearB);
+      bankStart = prevStateB.bankEnd || 0;
+    } else {
+      bankStart = baseBankStart;
+    }
+  }
 
   // Titel
   var yt = document.getElementById("yearTitle");
   if(yt){ yt.textContent = "Jaar: " + year; }
 
   // Invulvelden
-    // Invulvelden – v80 fix:
-  // UI gebruikt NOOIT oude localStorage-waardes als override.
-  // Alleen echte handmatige invoer (in dit jaar) telt.
   var startInput = document.getElementById("startingSavingsInput");
-  if(startInput){
-    if(settings.yearStarting[year] !== undefined && settings.yearStarting[year] !== ""){
-      startInput.value = settings.yearStarting[year];
-    } else {
-      startInput.value = start; // automatisch doorrollen
-    }
-  }
+  if(startInput){ startInput.value = start; }
 
   var bankInput = document.getElementById("startingBankInput");
-  if(bankInput){
-    if(settings.yearBankStarting[year] !== undefined && settings.yearBankStarting[year] !== ""){
-      bankInput.value = settings.yearBankStarting[year];
-    } else {
-      bankInput.value = bankStart; // automatisch doorrollen
-    }
-  }
-
+  if(bankInput){ bankInput.value = bankStart; }
 
   // Maandelijkse spaaractie invullen
   var ym = settings.yearMonthlySaving[year] || null;
@@ -1125,26 +1070,6 @@ if(msAmountEl && msTypeEl){
 
   // Initial render
   renderCategories();
-// v81 – Reset alleen jaar-overrides (handmatige beginsaldi + maandelijkse spaaractie)
-var resetBtn = document.getElementById("resetYearOverridesBtn");
-if (resetBtn) {
-  resetBtn.onclick = function () {
-    var settings = loadSettings();
-
-    // Reset jaar-startwaarden
-    settings.yearStarting = {};
-    settings.yearBankStarting = {};
-    settings.yearMonthlySaving = {};
-
-    saveSettings(settings);
-
-    // Cache legen
-    yearCache = {};
-
-    alert("Jaar-overrides succesvol gereset.\nGa nu naar het gewenste jaar om opnieuw te berekenen.");
-    renderYear();
-  };
-}
 </script>
 
 
