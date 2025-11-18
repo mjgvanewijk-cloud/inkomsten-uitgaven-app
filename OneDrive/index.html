@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Inkomsten & Uitgaven v6.2 – Jaar & Spaar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    background:#050711;
+    color:#fff;
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    margin:0;
+    padding:20px;
+  }
+
+  .tabs { display:flex; gap:10px; margin-bottom:20px; }
+  .tab { padding:10px 16px; background:#111320; border-radius:10px; cursor:pointer; }
+  .tab.active { background:#2f46ff; }
+  .hidden { display:none; }
+
+  .btn-main {
+    background:#2f46ff;
+    padding:12px 14px;
+    border:none;
+    border-radius:12px;
+    font-size:18px;
+    color:#fff;
+    width:100%;
+    margin-bottom:12px;
+  }
+
+  .card {
+    background:#111320;
+    padding:16px 16px 14px;
+    border-radius:16px;
+    margin-bottom:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    position:relative;
+  }
+  .card-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:6px;
+    gap:8px;
+  }
+  .card-left { min-width:0; }
+  .label {
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:8px;
+    font-size:13px;
+    margin-bottom:6px;
+  }
+  .income { background:#1b7f42; }
+  .expense { background:#9b1d2e; }
+  .title { font-size:18px; margin:0; }
+  .subtitle { font-size:14px; color:#a4a7c4; margin-top:2px; }
+
+  .icon-buttons { display:flex; gap:4px; }
+  .icon-btn {
+    width:30px; height:30px; border-radius:999px;
+    border:none; background:#191b30;
+    display:flex; align-items:center; justify-content:center;
+    padding:0; cursor:pointer;
+  }
+  .icon-btn svg { width:16px; height:16px; fill:#d7daff; }
+
+  input.amount-input, .savings-input {
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    margin-top:6px;
+    background:#191b30;
+    color:#fff;
+  }
+
+
+  .month-nav {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .month-label {
+    flex:1;
+    text-align:center;
+    font-weight:600;
+    font-size:16px;
+  }
+  .nav-btn {
+    width:34px;
+    height:34px;
+    border-radius:999px;
+    border:none;
+    background:#191b30;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    cursor:pointer;
+  }
+  .nav-btn svg {
+    width:18px;
+    height:18px;
+    fill:#d7daff;
+  }
+
+  .totals { margin-top:20px; }
+  .tot-card {
+    background:#111320;
+    padding:14px;
+    border-radius:16px;
+    margin-bottom:8px;
+    font-size:16px;
+  }
+  .green { color:#4be37f; }
+  .red { color:#ff4b4b; }
+  .blue { color:#4ba7ff; }
+
+  /* Savings list */
+  .savings-card-title { font-size:16px; margin-bottom:8px; color:#a4a7c4; }
+  .savings-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:6px 0; border-bottom:1px solid #1e2137;
+    font-size:14px;
+  }
+  .savings-row:last-child { border-bottom:none; }
+  .savings-label { color:#fff; }
+  .savings-type-deposit { color:#4be37f; }
+  .savings-type-withdrawal { color:#ff4b4b; }
+  .savings-remove {
+    border:none; background:transparent; color:#ff8080;
+    font-size:18px; cursor:pointer; padding:0 4px;
+  }
+
+  .savings-form select, .savings-form input {
+    width:100%; margin-top:6px;
+  }
+  .savings-form button {
+    margin-top:8px;
+    width:100%;
+    border:none;
+    border-radius:10px;
+    padding:10px;
+    background:#2f46ff;
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+  }
+
+  /* Modal sheet */
+  .overlay {
+    position:fixed;
+    left:0; top:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(5px);
+    display:none;
+  }
+  .sheet {
+    position:fixed;
+    left:0; right:0;
+    bottom:0;
+    background:#111320;
+    padding:20px;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -4px 30px rgba(0,0,0,0.6);
+    transform:translateY(100%);
+    transition:transform 0.25s ease-out;
+  }
+  .sheet.show { transform:translateY(0); }
+  .sheet h2 { margin-top:0; margin-bottom:12px; }
+  .sheet input, .sheet select {
+    width:100%; padding:12px; border:none; border-radius:10px;
+    margin-bottom:12px; font-size:16px; background:#191b30; color:#fff;
+  }
+  .sheet-btn {
+    background:#2f46ff; padding:12px; border:none; border-radius:10px;
+    font-size:18px; color:#fff; width:100%; margin-top:4px;
+  }
+  .close-btn {
+    background:#33384d; padding:12px; border:none; border-radius:10px;
+    font-size:16px; color:#fff; width:100%; margin-top:8px;
+  }
+
+  /* Year table */
+  table.year-table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    font-size:14px;
+  }
+  .year-table th, .year-table td {
+    padding:6px 4px;
+    border-bottom:1px solid #1d2035;
+    text-align:right;
+  }
+  .year-table th:first-child,
+  .year-table td:first-child {
+    text-align:left;
+  }
+  .year-table tfoot td {
+    font-weight:bold;
+    border-top:1px solid #2a2d45;
+  }
+
+  .settings-card {
+    background:#111320;
+    padding:14px;
+    border-radius:16px;
+    margin-bottom:12px;
+  }
+  .settings-card label {
+    font-size:14px;
+    color:#a4a7c4;
+    display:block;
+    margin-bottom:4px;
+  }
+  .settings-card input {
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#191b30;
+    color:#fff;
+  }
+  .settings-card button {
+  margin-top:8px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  background:#2f46ff;
+  color:#fff;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.year-nav { 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  margin:10px 0; 
+}
+
+.year-title { 
+  font-size:18px; 
+  font-weight:600; 
+}
+
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" data-tab="categories">Categorieën</div>
+  <div class="tab" data-tab="month">Maand</div>
+  <div class="tab" data-tab="year">Jaar</div>
+</div>
+
+<!-- Categorieën-tab -->
+<div id="tab-categories">
+  <button id="newCat" class="btn-main">Nieuwe categorie</button>
+  <div id="catList"></div>
+</div>
+
+<!-- Maand-tab -->
+<div id="tab-month" class="hidden">
+  <div class="month-nav">
+    <button id="monthPrev" class="nav-btn" aria-label="Vorige maand">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <div class="month-label" id="monthTitle">Maand</div>
+    <button id="monthNext" class="nav-btn" aria-label="Volgende maand">
+      <svg viewBox="0 0 24 24"><path d="m10 6 1.41 1.41L8.83 12l2.58 2.59L10 16l-6-6z" transform="scale(-1,1) translate(-24,0)"/></svg>
+    </button>
+  </div>
+  <div id="monthList"></div>
+
+  <div class="totals">
+    <div class="tot-card"><strong class="green">INKOMEN:</strong> <span id="tIncome"></span></div>
+    <div class="tot-card"><strong class="red">UITGAVEN:</strong> <span id="tExpense"></span></div>
+    <div class="tot-card"><strong class="blue">BESCHIKBAAR:</strong> <span id="tAvail"></span></div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="savings-card-title">Spaaracties voor deze maand</div>
+    <div id="savingsList"></div>
+    <div class="savings-form">
+      <select id="sType">
+        <option value="deposit">Storting naar spaarrekening</option>
+        <option value="withdrawal">Opname van spaarrekening</option>
+      </select>
+      <input id="sAmount" class="savings-input" placeholder="Bedrag">
+      <input id="sLabel" class="savings-input" placeholder="Omschrijving (optioneel)">
+      <button id="sAdd">Spaaractie toevoegen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Jaar-tab -->
+<div id="tab-year" class="hidden">
+  <h2>Jaaroverzicht</h2>
+  <div class="year-nav">
+    <button id="prevYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+    <div id="yearTitle" class="year-title"></div>
+    <button id="nextYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
+  </div>
+    <div class="settings-card">
+  <label for="startingBankInput">Beginsaldo bankrekening</label>
+  <input id="startingBankInput" placeholder="Bijv. 1200">
+
+  <label for="startingSavingsInput" style="margin-top:8px; display:block;">Beginsaldo spaarrekening</label>
+  <input id="startingSavingsInput" placeholder="Bijv. 0">
+
+  <div style="margin-top:10px; font-size:14px; color:#a4a7c4;">
+    Maandelijkse spaaractie (voor dit jaar)
+  </div>
+  <div style="display:flex; gap:8px; margin-top:6px;">
+    <input id="monthlySavingAmount" placeholder="Bijv. 150" style="flex:1;">
+    <select id="monthlySavingType" style="width:120px;">
+      <option value="deposit">Storting</option>
+      <option value="withdrawal">Opname</option>
+    </select>
+  </div>
+
+  <button id="saveSettingsBtn">Instellingen opslaan</button>
+</div>
+
+
+  <div class="card">
+    <table class="year-table">
+  <thead>
+    <tr>
+      <th>Maand</th>
+      <th>In</th>
+      <th>Uit</th>
+      <th>Besch</th>
+      <th>Bank</th>
+      <th>Spaar</th>
+    </tr>
+  </thead>
+  <tbody id="yearBody"></tbody>
+  <tfoot>
+    <tr>
+      <td>Totaal</td>
+      <td id="yIncome"></td>
+      <td id="yExpense"></td>
+      <td id="yAvail"></td>
+      <td id="yBankEnd"></td>
+      <td id="yFictive"></td>
+    </tr>
+  </tfoot>
+</table>
+
+
+  </div>
+</div>
+
+<!-- Modal sheet -->
+<div id="overlay" class="overlay"></div>
+
+<div id="sheet" class="sheet">
+  <h2 id="sheetTitle">Categorie</h2>
+  <input id="nameInput" placeholder="Naam">
+  <input id="amountInput" placeholder="Standaard maandbedrag">
+  <select id="typeInput">
+    <option value="income">Inkomen</option>
+    <option value="expense">Uitgave</option>
+  </select>
+  <button id="sheetSave" class="sheet-btn">Opslaan</button>
+  <button id="sheetClose" class="close-btn">Sluiten</button>
+</div>
+
+<script>
+  function nowMonth() {
+    var d = new Date();
+    var m = String(d.getMonth()+1);
+    if (m.length === 1) m = "0"+m;
+    return d.getFullYear() + "-" + m;
+  }
+  function monthName(n){
+    var arr=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
+    return arr[n-1] || "";
+  }
+
+  var currentMonthKey = nowMonth();
+  var currentYear = (new Date()).getFullYear();
+
+  var CAT_KEY = "simple_modal_type_v1";
+  var MONTH_KEY = "month_overwrite_v1";
+  var SAVINGS_KEY = "savings_actions_v1";
+  var SETTINGS_KEY = "app_settings_v1";
+
+  function loadCats(){
+    try{var r=localStorage.getItem(CAT_KEY);if(r)return JSON.parse(r);}catch(e){}
+    return [];
+  }
+  function saveCats(d){try{localStorage.setItem(CAT_KEY,JSON.stringify(d));}catch(e){}}
+
+  function loadMonthData(){
+    try{var r=localStorage.getItem(MONTH_KEY);if(r)return JSON.parse(r);}catch(e){}
+    return {};
+  }
+  function saveMonthData(d){try{localStorage.setItem(MONTH_KEY,JSON.stringify(d));}catch(e){}}
+
+  function loadSavings(){
+    try{var r=localStorage.getItem(SAVINGS_KEY);if(r)return JSON.parse(r);}catch(e){}
+    return {};
+  }
+  function saveSavings(d){try{localStorage.setItem(SAVINGS_KEY,JSON.stringify(d));}catch(e){}}
+
+  function loadSettings(){
+    try{
+      var r=localStorage.getItem(SETTINGS_KEY);
+      if(r) return JSON.parse(r);
+    }catch(e){}
+    return { startingSavings:60500 };
+  }
+  function saveSettings(s){
+    try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));}catch(e){}
+  }
+
+
+  function setMonthKeyFromParts(year, month){
+    // normalize month 1-12
+    while(month < 1){ month += 12; year -= 1; }
+    while(month > 12){ month -= 12; year += 1; }
+    var mStr = String(month);
+    if(mStr.length === 1) mStr = "0" + mStr;
+    currentMonthKey = String(year) + "-" + mStr;
+  }
+
+  function changeMonth(offset){
+    // currentMonthKey is 'YYYY-MM'
+    var parts = currentMonthKey.split("-");
+    var year = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10);
+    if(isNaN(year) || isNaN(month)){
+      currentMonthKey = nowMonth();
+      parts = currentMonthKey.split("-");
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+    }
+    month += offset;
+    setMonthKeyFromParts(year, month);
+    renderMonth();
+    // Jaaroverzicht opnieuw berekenen omdat fictief gespaard afhankelijk is van alle maanden
+    var active = document.querySelector(".tab.active");
+    if(active && active.getAttribute("data-tab") === "year"){
+      renderYear();
+    }
+  }
+
+  function changeYear(offset){
+    currentYear += offset;
+    renderYear();
+  }
+
+  // Navigatieknoppen voor maand
+// Swipe-functionaliteit verwijderd voor v71
+// Tabs
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      this.classList.add("active");
+
+      document.getElementById("tab-categories").classList.add("hidden");
+      document.getElementById("tab-month").classList.add("hidden");
+      document.getElementById("tab-year").classList.add("hidden");
+
+      var target=this.getAttribute("data-tab");
+      document.getElementById("tab-"+target).classList.remove("hidden");
+
+      if(target==="month") renderMonth();
+      if(target==="year") renderYear();
+    });
+  });
+
+  // Modal
+  var overlay=document.getElementById("overlay");
+  var sheet=document.getElementById("sheet");
+  var editIndex=null;
+
+  function openSheet(index){
+    var cats=loadCats();
+    editIndex = (index===null || index===undefined) ? null : index;
+    var c = (editIndex!==null && cats[editIndex]) ? cats[editIndex] : {name:"",amount:"",type:"income"};
+
+    document.getElementById("sheetTitle").textContent = editIndex===null ? "Nieuwe categorie" : "Categorie bewerken";
+    document.getElementById("nameInput").value = c.name || "";
+    document.getElementById("amountInput").value = c.amount || "";
+    document.getElementById("typeInput").value = c.type || "income";
+
+    overlay.style.display="block";
+    setTimeout(function(){sheet.classList.add("show");},10);
+  }
+  function closeSheet(){
+    sheet.classList.remove("show");
+    setTimeout(function(){overlay.style.display="none";},250);
+    editIndex=null;
+  }
+
+  document.getElementById("newCat").onclick=function(){openSheet(null);};
+  document.getElementById("sheetClose").onclick=closeSheet;
+  overlay.onclick=closeSheet;
+
+  document.getElementById("sheetSave").onclick=function(){
+    var name=document.getElementById("nameInput").value.trim();
+    var amt=document.getElementById("amountInput").value.trim();
+    var typ=document.getElementById("typeInput").value;
+    if(!name){alert("Naam verplicht");return;}
+    var cats=loadCats();
+    if(editIndex!==null && cats[editIndex]){
+      cats[editIndex]={name:name,amount:amt,type:typ};
+    }else{
+      cats.push({name:name,amount:amt,type:typ});
+    }
+    saveCats(cats);
+    closeSheet();
+    renderCategories();
+    var active=document.querySelector(".tab.active");
+    if(active && active.getAttribute("data-tab")==="month"){renderMonth();}
+    if(active && active.getAttribute("data-tab")==="year"){renderYear();}
+  };
+
+  function renderCategories(){
+    var list=document.getElementById("catList");
+    list.innerHTML="";
+    var cats=loadCats();
+    cats.forEach(function(c,idx){
+      var card=document.createElement("div");
+      card.className="card";
+
+      var header=document.createElement("div");
+      header.className="card-header";
+
+      var left=document.createElement("div");
+      left.className="card-left";
+
+      var tag=document.createElement("div");
+      tag.className="label " + (c.type==="income"?"income":"expense");
+      tag.textContent=c.type==="income"?"INKOMEN":"UITGAVE";
+      left.appendChild(tag);
+
+      var title=document.createElement("p");
+      title.className="title";
+      title.textContent=c.name+" — "+(c.amount||"0");
+      left.appendChild(title);
+
+      header.appendChild(left);
+
+      var icons=document.createElement("div");
+      icons.className="icon-buttons";
+
+      var editBtn=document.createElement("button");
+      editBtn.className="icon-btn";
+      editBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 17.25V20h2.75L17.81 8.94l-2.75-2.75L4 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-1.5-1.5a1.003 1.003 0 0 0-1.42 0L14.13 6.96l2.75 2.75 1.83-1.83z"/></svg>';
+      editBtn.onclick=function(){openSheet(idx);};
+      icons.appendChild(editBtn);
+
+      var delBtn=document.createElement("button");
+      delBtn.className="icon-btn";
+      delBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 7h12v2H6V7zm2 3h8v9H8v-9zm3-6h2v2h-2V4z"/></svg>';
+      delBtn.onclick=function(){
+        if(confirm("Categorie '"+c.name+"' verwijderen?")){
+          var cs=loadCats();
+          cs.splice(idx,1);
+          saveCats(cs);
+          renderCategories();
+          renderMonth();
+          renderYear();
+        }
+      };
+      icons.appendChild(delBtn);
+
+      header.appendChild(icons);
+      card.appendChild(header);
+
+      list.appendChild(card);
+    });
+  }
+
+  function renderMonth(){
+    var mKey=currentMonthKey;
+    document.getElementById("monthTitle").textContent="Maand: "+ monthName(parseInt(mKey.split("-")[1],10)) + " " + mKey.split("-")[0];
+    var cats=loadCats();
+    var md=loadMonthData();
+    if(!md[mKey]) md[mKey]={};
+    saveMonthData(md);
+
+    var list=document.getElementById("monthList");
+    list.innerHTML="";
+    var income=0,expense=0;
+
+    cats.forEach(function(c,idx){
+      var card=document.createElement("div");
+      card.className="card";
+
+      var header=document.createElement("div");
+      header.className="card-header";
+
+      var left=document.createElement("div");
+      left.className="card-left";
+
+      var tag=document.createElement("div");
+      tag.className="label "+(c.type==="income"?"income":"expense");
+      tag.textContent=c.type==="income"?"INKOMEN":"UITGAVE";
+      left.appendChild(tag);
+
+      var title=document.createElement("p");
+      title.className="title";
+      title.textContent=c.name;
+      left.appendChild(title);
+
+      var sub=document.createElement("div");
+      sub.className="subtitle";
+      sub.textContent="Standaard: "+(c.amount||"0");
+      left.appendChild(sub);
+
+      header.appendChild(left);
+      card.appendChild(header);
+
+      var inp=document.createElement("input");
+      inp.className="amount-input";
+      var stored = (md[mKey] && md[mKey][idx]!=null)? md[mKey][idx] : (c.amount||"0");
+      inp.value=stored;
+      inp.onchange=function(){
+        var cur=loadMonthData();
+        if(!cur[mKey]) cur[mKey]={};
+        cur[mKey][idx]=this.value;
+        saveMonthData(cur);
+        renderMonth();
+      };
+      card.appendChild(inp);
+
+      var num=parseFloat(stored);
+      if(isNaN(num)) num=0;
+      if(c.type==="income") income+=num;
+      else expense+=num;
+
+      list.appendChild(card);
+    });
+
+    document.getElementById("tIncome").textContent=income.toFixed(0);
+    document.getElementById("tExpense").textContent=expense.toFixed(0);
+    // Spaaracties van deze maand meenemen in beschikbaar
+    var savings = loadSavings();
+    var arr = savings[mKey] || [];
+    var dep = 0, wdr = 0;
+    arr.forEach(function(a){
+      var n = parseFloat(a.amount);
+      if(isNaN(n)) n = 0;
+      if(a.type==="deposit") dep += n;
+      else if(a.type==="withdrawal") wdr += n;
+    });
+    var avail = income - expense - dep + wdr;
+    document.getElementById("tAvail").textContent=avail.toFixed(0);
+
+    renderSavingsList();
+  }
+
+  function renderSavingsList(){
+    var mKey=currentMonthKey;
+    var savings=loadSavings();
+    var listDiv=document.getElementById("savingsList");
+    listDiv.innerHTML="";
+    var arr=savings[mKey] || [];
+    if(!arr.length){
+      var p=document.createElement("p");
+      p.style.color="#a4a7c4";
+      p.style.fontSize="14px";
+      p.textContent="Nog geen spaaracties voor deze maand.";
+      listDiv.appendChild(p);
+      return;
+    }
+    arr.forEach(function(a,idx){
+      var row=document.createElement("div");
+      row.className="savings-row";
+      var left=document.createElement("div");
+      var typeSpan=document.createElement("span");
+      typeSpan.className = a.type==="deposit"?"savings-type-deposit":"savings-type-withdrawal";
+      typeSpan.textContent = a.type==="deposit"?"STORTING":"OPNAME";
+      left.appendChild(typeSpan);
+      var lbl=document.createElement("span");
+      lbl.className="savings-label";
+      lbl.textContent = " – " + (a.label||"");
+      left.appendChild(lbl);
+      row.appendChild(left);
+
+      var right=document.createElement("div");
+      right.textContent = a.amount;
+      var btn=document.createElement("button");
+      btn.className="savings-remove";
+      btn.textContent="×";
+      btn.onclick=function(){
+        var s=loadSavings();
+        var arr2=s[mKey]||[];
+        arr2.splice(idx,1);
+        s[mKey]=arr2;
+        saveSavings(s);
+        renderMonth();
+        renderYear();
+      };
+      right.appendChild(btn);
+      row.appendChild(right);
+
+      listDiv.appendChild(row);
+    });
+  }
+
+  document.getElementById("sAdd").onclick=function(){
+    var mKey=currentMonthKey;
+    var type=document.getElementById("sType").value;
+    var amountStr=document.getElementById("sAmount").value.trim();
+    var label=document.getElementById("sLabel").value.trim();
+    if(!amountStr){alert("Bedrag verplicht");return;}
+    var num=parseFloat(amountStr.replace(",", "."));
+    if(isNaN(num) || num<=0){alert("Ongeldig bedrag");return;}
+    var s=loadSavings();
+    if(!s[mKey]) s[mKey]=[];
+    s[mKey].push({type:type,amount:num,label:label});
+    saveSavings(s);
+    document.getElementById("sAmount").value="";
+    document.getElementById("sLabel").value="";
+    renderMonth();
+    renderYear();
+  };
+
+  function computeMonthTotalsFor(year, monthIdx){
+    var mStr = String(monthIdx);
+    if(mStr.length===1) mStr="0"+mStr;
+    var mKey = year + "-" + mStr;
+
+    var cats = loadCats();
+    var md   = loadMonthData();
+    var s    = loadSavings();
+    var settings = loadSettings();
+    if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
+
+    var income = 0, expense = 0;
+    var overrides = md[mKey] || {};
+    cats.forEach(function(c, idx){
+      var valStr = overrides[idx]!=null ? overrides[idx] : (c.amount||"0");
+      var num = parseFloat(valStr);
+      if(isNaN(num)) num = 0;
+      if(c.type==="income") income += num;
+      else expense += num;
+    });
+
+    // Handmatige spaaracties
+    var deposits = 0, withdrawals = 0;
+    var arr = s[mKey] || [];
+    arr.forEach(function(a){
+      var n = parseFloat(a.amount);
+      if(isNaN(n)) n = 0;
+      if(a.type==="deposit") deposits += n;
+      else if(a.type==="withdrawal") withdrawals += n;
+    });
+
+        // v74: maandelijkse standaard spaaractie
+    // Alleen als de maand NIET "afgesloten" is (dus geen handmatige overrides/savings)
+    var yearlyDef = settings.yearMonthlySaving[year];
+    var closed = isMonthClosed(year, monthIdx);
+    if(!closed && yearlyDef && yearlyDef.amount){
+      var defAmount = Number(yearlyDef.amount) || 0;
+      if(defAmount > 0){
+        if(yearlyDef.type === "withdrawal"){
+          withdrawals += defAmount;
+        } else {
+          // default = storting
+          deposits += defAmount;
+        }
+      }
+    }
+
+
+    // Beschikbaar blijft hier zoals in v71: na spaaracties
+    var available = income - expense - deposits + withdrawals;
+
+    return {
+      income: income,
+      expense: expense,
+      available: available,
+      deposits: deposits,
+      withdrawals: withdrawals
+    };
+  }
+
+
+// v76: een maand is alleen "afgesloten" als er spaaracties zijn
+// Categorie-overrides tellen NIET meer mee voor locken.
+function isMonthClosed(year, monthIdx){
+  var mStr = String(monthIdx);
+  if (mStr.length === 1) mStr = "0" + mStr;
+  var key = year + "-" + mStr;
+
+  var s = loadSavings();
+  var hasSavings = s[key] && s[key].length > 0;
+
+  // Alleen spaaracties bepalen of de maand locked is
+  return !!hasSavings;
+}
+
+
+
+// v74: bereken eindstand bank en spaarrekening voor een jaar
+function computeYearEndState(year){
+  var settings = loadSettings();
+  if(!settings.yearStarting){ settings.yearStarting = {}; }
+  if(!settings.yearBankStarting){ settings.yearBankStarting = {}; }
+  if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
+
+  // Spaar: beginsaldo (zelfde logica als in renderYear)
+  var start;
+  if (settings.yearStarting[year] != null && settings.yearStarting[year] !== "") {
+    start = Number(settings.yearStarting[year]);
+  } else {
+    var prevYear = year - 1;
+    if (prevYear >= 1900) {
+      var prevState = computeYearEndState(prevYear);
+      start = prevState.savingEnd || 0;
+    } else {
+      start = 0;
+    }
+  }
+
+  // Bank: beginsaldo (zelfde logica als in renderYear)
+  var bank;
+  if (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "") {
+    bank = Number(settings.yearBankStarting[year]);
+  } else {
+    var prevYearB = year - 1;
+    if (prevYearB >= 1900) {
+      var prevStateB = computeYearEndState(prevYearB);
+      bank = prevStateB.bankEnd || 0;
+    } else {
+      bank = 0;
+    }
+  }
+
+  var cumDep = 0;
+  var cumWdr = 0;
+
+  for (var m = 1; m <= 12; m++) {
+    var t = computeMonthTotalsFor(year, m);
+    cumDep += t.deposits;
+    cumWdr += t.withdrawals;
+    bank   += t.available; // beschikbaar al na spaaracties
+  }
+
+  var spaarEind = start + cumDep - cumWdr;
+
+  return {
+    bankEnd: bank,
+    savingEnd: spaarEind
+  };
+}
+
+
+
+  
+  function renderYear(){
+  var settings = loadSettings();
+  if(!settings.yearStarting){ settings.yearStarting = {}; }        // spaar
+  if(!settings.yearBankStarting){ settings.yearBankStarting = {}; } // bank
+  if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
+
+  var year = currentYear;
+
+  // Spaar: beginsaldo
+  var baseSavingsStart = 0;
+  var start;
+  if(settings.yearStarting[year] != null){
+    start = Number(settings.yearStarting[year]);
+  } else {
+    // v74: als er geen expliciet beginsaldo is,
+    // gebruik dan spaar-eind van vorig jaar (indien beschikbaar)
+    var prevYear = year - 1;
+    if(prevYear >= 1900){
+      var prevState = computeYearEndState(prevYear);
+      start = prevState.savingEnd || 0;
+    } else {
+      start = baseSavingsStart;
+    }
+  }
+
+  // Bank: beginsaldo
+  var baseBankStart = 0;
+  var bankStart;
+  if(settings.yearBankStarting[year] != null){
+    bankStart = Number(settings.yearBankStarting[year]);
+  } else {
+    // v74: als er geen expliciet beginsaldo is,
+    // gebruik dan bank-eind van vorig jaar (indien beschikbaar)
+    var prevYearB = year - 1;
+    if(prevYearB >= 1900){
+      var prevStateB = computeYearEndState(prevYearB);
+      bankStart = prevStateB.bankEnd || 0;
+    } else {
+      bankStart = baseBankStart;
+    }
+  }
+
+  // Titel
+  var yt = document.getElementById("yearTitle");
+  if(yt){ yt.textContent = "Jaar: " + year; }
+
+  // Invulvelden
+  var startInput = document.getElementById("startingSavingsInput");
+  if(startInput){ startInput.value = start; }
+
+  var bankInput = document.getElementById("startingBankInput");
+  if(bankInput){ bankInput.value = bankStart; }
+
+  // Maandelijkse spaaractie invullen
+  var ym = settings.yearMonthlySaving[year] || null;
+  var msAmount = document.getElementById("monthlySavingAmount");
+  var msType   = document.getElementById("monthlySavingType");
+
+  if(msAmount){
+    msAmount.value = ym && ym.amount != null ? ym.amount : "";
+  }
+  if(msType){
+    msType.value = ym && ym.type ? ym.type : "deposit";
+  }
+
+  // Tabel vullen
+  var body = document.getElementById("yearBody");
+  body.innerHTML = "";
+
+  var totInc  = 0;
+  var totExp  = 0;
+  var totAvail= 0;
+  var cumDep  = 0;
+  var cumWdr  = 0;
+
+  // v74: banksaldo door het jaar
+  var bank = bankStart;
+
+  for(var m = 1; m <= 12; m++){
+    var t = computeMonthTotalsFor(year, m);
+
+    totInc   += t.income;
+    totExp   += t.expense;
+    totAvail += t.available;
+    cumDep   += t.deposits;
+    cumWdr   += t.withdrawals;
+
+    // Spaarrekening (fictief gespaard)
+    var fictive = start + cumDep - cumWdr;
+
+    // Banksaldo eind van de maand
+    bank += t.available;
+
+    var tr = document.createElement("tr");
+
+    var tdM = document.createElement("td");
+    tdM.textContent = monthName(m);
+    tr.appendChild(tdM);
+
+    var tdI = document.createElement("td");
+    tdI.textContent = t.income.toFixed(0);
+    tr.appendChild(tdI);
+
+    var tdE = document.createElement("td");
+    tdE.textContent = t.expense.toFixed(0);
+    tr.appendChild(tdE);
+
+    var tdA = document.createElement("td");
+    tdA.textContent = t.available.toFixed(0);
+    tr.appendChild(tdA);
+
+    var tdB = document.createElement("td");
+    tdB.textContent = bank.toFixed(0);
+    tr.appendChild(tdB);
+
+    var tdF = document.createElement("td");
+    tdF.textContent = fictive.toFixed(0);
+    if(t.withdrawals > 0)      tdF.style.color = '#ff4b4b';
+    else if(t.deposits > 0)    tdF.style.color = 'lightgreen';
+    tr.appendChild(tdF);
+
+    body.appendChild(tr);
+  }
+
+  var finalFictive = start + cumDep - cumWdr;
+
+  var elInc  = document.getElementById("yIncome");
+  var elExp  = document.getElementById("yExpense");
+  var elAvail= document.getElementById("yAvail");
+  var elBank = document.getElementById("yBankEnd");
+  var elFict = document.getElementById("yFictive");
+
+  if(elInc)   elInc.textContent   = totInc.toFixed(0);
+  if(elExp)   elExp.textContent   = totExp.toFixed(0);
+  if(elAvail) elAvail.textContent = totAvail.toFixed(0);
+  if(elBank)  elBank.textContent  = bank.toFixed(0);
+  if(elFict)  elFict.textContent  = finalFictive.toFixed(0);
+}
+
+
+
+   document.getElementById("saveSettingsBtn").onclick = function(){
+  var s = loadSettings();
+  if(!s.yearStarting){ s.yearStarting = {}; }        // spaar
+  if(!s.yearBankStarting){ s.yearBankStarting = {}; } // bank
+  if(!s.yearMonthlySaving){ s.yearMonthlySaving = {}; }
+
+  // Beginsaldo bankrekening
+  var bankEl = document.getElementById("startingBankInput");
+  if(bankEl){
+    var valBank = bankEl.value.trim();
+    if(valBank !== ""){
+      var numBank = parseFloat(valBank.replace(",", "."));
+      if(isNaN(numBank)){
+        alert("Ongeldig beginsaldo bankrekening");
+        return;
+      }
+      s.yearBankStarting[currentYear] = numBank;
+    } else {
+      // leeg laten = default 0
+      delete s.yearBankStarting[currentYear];
+    }
+  }
+
+  // Beginsaldo spaarrekening
+  var savEl = document.getElementById("startingSavingsInput");
+  if(savEl){
+    var valStart = savEl.value.trim();
+    if(valStart !== ""){
+      var numStart = parseFloat(valStart.replace(",", "."));
+      if(isNaN(numStart)){
+        alert("Ongeldig beginsaldo spaarrekening");
+        return;
+      }
+      s.yearStarting[currentYear] = numStart;
+    } else {
+      // leeg laten = default 0
+      delete s.yearStarting[currentYear];
+    }
+  }
+
+  // Maandelijkse spaaractie (v75 fix: 0 is toegestaan)
+var msAmountEl = document.getElementById("monthlySavingAmount");
+var msTypeEl   = document.getElementById("monthlySavingType");
+if(msAmountEl && msTypeEl){
+  var msVal = msAmountEl.value.trim();
+
+  if(msVal !== ""){
+    var msNum = parseFloat(msVal.replace(",", "."));
+    if(isNaN(msNum) || msNum < 0){
+      alert("Ongeldig bedrag voor maandelijkse spaaractie");
+      return;
+    }
+
+    // Als je 0 invult → gewoon opslaan (betekent: geen spaaractie)
+    s.yearMonthlySaving[currentYear] = {
+      amount: msNum,
+      type: msTypeEl.value === "withdrawal" ? "withdrawal" : "deposit"
+    };
+  } else {
+    // Leeg veld = volledig verwijderen / resetten
+    delete s.yearMonthlySaving[currentYear];
+  }
+}
+
+
+  saveSettings(s);
+  renderYear();
+};
+
+
+
+  
+  var prevYearBtn = document.getElementById("prevYearBtn");
+  var nextYearBtn = document.getElementById("nextYearBtn");
+  if(prevYearBtn){ prevYearBtn.onclick = function(){ changeYear(-1); }; }
+  if(nextYearBtn){ nextYearBtn.onclick = function(){ changeYear(1); }; }
+
+  // Initial render
+  renderCategories();
+</script>
+
+
+<script>
+// herstelde DOMContentLoaded zonder swipe
+document.addEventListener("DOMContentLoaded", function(){
+  var prevBtn = document.getElementById("monthPrev");
+  var nextBtn = document.getElementById("monthNext");
+  if(prevBtn){ prevBtn.addEventListener("click", function(){ changeMonth(-1); }); }
+  if(nextBtn){ nextBtn.addEventListener("click", function(){ changeMonth(1); }); }
+});
+</script>
+
+</body>
+</html>
