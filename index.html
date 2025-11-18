@@ -456,15 +456,9 @@
   }
 
   function changeYear(offset){
-    var newYear = currentYear + offset;
-
-    // blokkeer ondergrens: nooit onder 1900
-    if(newYear < 1900){
-        return; // doe niks als je nog verder terug probeert
-    }
-
-    currentYear = newYear;
+    currentYear += offset;
     renderYear();
+  }
 
   // Navigatieknoppen voor maand
 // Swipe-functionaliteit verwijderd voor v71
@@ -502,7 +496,7 @@
     document.getElementById("amountInput").value = c.amount || "";
     document.getElementById("typeInput").value = c.type || "income";
 
-    overlay.style.display="block";[
+    overlay.style.display="block";
     setTimeout(function(){sheet.classList.add("show");},10);
   }
   function closeSheet(){
@@ -798,20 +792,23 @@
   }
 
 
-// v76: een maand is alleen "afgesloten" als er spaaracties zijn
-// Categorie-overrides tellen NIET meer mee voor locken.
+// v74: bepaal of een maand "afgesloten" is
+// Een maand is afgesloten als:
+// - er maand-overrides zijn OF
+// - er spaaracties zijn
 function isMonthClosed(year, monthIdx){
   var mStr = String(monthIdx);
-  if (mStr.length === 1) mStr = "0" + mStr;
+  if(mStr.length === 1) mStr = "0" + mStr;
   var key = year + "-" + mStr;
 
-  var s = loadSavings();
-  var hasSavings = s[key] && s[key].length > 0;
+  var md = loadMonthData();
+  var s  = loadSavings();
 
-  // Alleen spaaracties bepalen of de maand locked is
-  return !!hasSavings;
+  var hasOverrides = md[key] && Object.keys(md[key]).length > 0;
+  var hasSavings   = s[key] && s[key].length > 0;
+
+  return !!(hasOverrides || hasSavings);
 }
-
 
 
 // v74: bereken eindstand bank en spaarrekening voor een jaar
@@ -821,42 +818,26 @@ function computeYearEndState(year){
   if(!settings.yearBankStarting){ settings.yearBankStarting = {}; }
   if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
 
-  // Spaar: beginsaldo (zelfde logica als in renderYear)
-  var start;
-  if (settings.yearStarting[year] != null && settings.yearStarting[year] !== "") {
-    start = Number(settings.yearStarting[year]);
-  } else {
-    var prevYear = year - 1;
-    if (prevYear >= 1900) {
-      var prevState = computeYearEndState(prevYear);
-      start = prevState.savingEnd || 0;
-    } else {
-      start = 0;
-    }
-  }
+  // Spaar start
+  var baseSavingsStart = 0;
+  var start = (settings.yearStarting[year] != null)
+    ? Number(settings.yearStarting[year])
+    : baseSavingsStart;
 
-  // Bank: beginsaldo (zelfde logica als in renderYear)
-  var bank;
-  if (settings.yearBankStarting[year] != null && settings.yearBankStarting[year] !== "") {
-    bank = Number(settings.yearBankStarting[year]);
-  } else {
-    var prevYearB = year - 1;
-    if (prevYearB >= 1900) {
-      var prevStateB = computeYearEndState(prevYearB);
-      bank = prevStateB.bankEnd || 0;
-    } else {
-      bank = 0;
-    }
-  }
+  // Bank start
+  var baseBankStart = 0;
+  var bank = (settings.yearBankStarting[year] != null)
+    ? Number(settings.yearBankStarting[year])
+    : baseBankStart;
 
   var cumDep = 0;
   var cumWdr = 0;
 
-  for (var m = 1; m <= 12; m++) {
+  for(var m = 1; m <= 12; m++){
     var t = computeMonthTotalsFor(year, m);
     cumDep += t.deposits;
     cumWdr += t.withdrawals;
-    bank   += t.available; // beschikbaar al na spaaracties
+    bank   += t.available;
   }
 
   var spaarEind = start + cumDep - cumWdr;
@@ -866,7 +847,6 @@ function computeYearEndState(year){
     savingEnd: spaarEind
   };
 }
-
 
 
   
