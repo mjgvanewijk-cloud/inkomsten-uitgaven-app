@@ -14,6 +14,12 @@ import {
 
 let onDataChanged = null;
 let yearMonthlyType = "deposit";
+
+function formatNumberInput(val) {
+  if (val === null || val === undefined) return "";
+  if (typeof val !== "number" || isNaN(val)) return "";
+  return val.toFixed(2).replace(".", ",");
+}
 let yearDepBtn = null;
 let yearWdrBtn = null;
 
@@ -96,15 +102,22 @@ export function renderYear() {
   const msAmount = document.getElementById("monthlySavingAmount");
 
   // Alleen expliciete beginsaldi tonen; doorrol-waarden tonen als getal, maar blijven overschrijfbaar
-  if (startInput) startInput.value = savingStart !== 0 ? String(savingStart) : "";
-  if (bankInput) bankInput.value = bankStart !== 0 ? String(bankStart) : "";
+  if (startInput) startInput.value = savingStart !== 0 ? formatNumberInput(savingStart) : "";
+  if (bankInput) bankInput.value = bankStart !== 0 ? formatNumberInput(bankStart) : "";
 
   const ym = Object.prototype.hasOwnProperty.call(yearMonthlySaving, year)
     ? yearMonthlySaving[year]
     : null;
 
   if (ym && msAmount) {
-    msAmount.value = ym.amount ?? "";
+    const amt = typeof ym.amount === "number"
+      ? ym.amount
+      : Number(String(ym.amount).replace(",", "."));
+    if (!isNaN(amt)) {
+      msAmount.value = formatNumberInput(amt);
+    } else {
+      msAmount.value = "";
+    }
     yearMonthlyType = ym.type || "deposit";
   } else if (msAmount) {
     msAmount.value = "";
@@ -278,11 +291,8 @@ function saveYearInputs() {
     if (v === "" || isNaN(num)) {
       // leeg veld -> geen expliciete override
       delete settings.yearStarting[year];
-    } else if (num === defaultSavingStart) {
-      // gelijk aan doorrolwaarde -> geen expliciete override opslaan
-      delete settings.yearStarting[year];
     } else {
-      // echte afwijking -> gebruiker wil dit jaar expliciet starten met dit saldo
+      // altijd opslaan wat de gebruiker opgeeft
       settings.yearStarting[year] = num;
     }
   }
@@ -293,9 +303,8 @@ function saveYearInputs() {
     let num = Number(v.replace(",", "."));
     if (v === "" || isNaN(num)) {
       delete settings.yearBankStarting[year];
-    } else if (num === defaultBankStart) {
-      delete settings.yearBankStarting[year];
     } else {
+      // altijd opslaan wat de gebruiker opgeeft
       settings.yearBankStarting[year] = num;
     }
   }
