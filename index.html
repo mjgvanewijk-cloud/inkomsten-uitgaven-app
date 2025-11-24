@@ -1,1360 +1,186 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<title>Inkomsten & Uitgaven v6.2 – Jaar & Spaar</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body {
-    background:#050711;
-    color:#fff;
-    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-    margin:0;
-    padding:20px;
-  }
+  <meta charset="UTF-8" />
+  <title>FinFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  .tabs { display:flex; gap:10px; margin-bottom:20px; }
-  .tab { padding:10px 16px; background:#111320; border-radius:10px; cursor:pointer; }
-  .tab.active { background:#2f46ff; }
-  .hidden { display:none; }
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-512.png" type="image/png" />
 
-  .btn-main {
-    background:#2f46ff;
-    padding:12px 14px;
-    border:none;
-    border-radius:12px;
-    font-size:18px;
-    color:#fff;
-    width:100%;
-    margin-bottom:12px;
-  }
-
-  .card {
-    background:#111320;
-    padding:16px 16px 14px;
-    border-radius:16px;
-    margin-bottom:12px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.4);
-    position:relative;
-  }
-  .card-header {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:6px;
-    gap:8px;
-  }
-  .card-left { min-width:0; }
-  .label {
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:8px;
-    font-size:13px;
-    margin-bottom:6px;
-  }
-  .income { background:#1b7f42; }
-  .expense { background:#9b1d2e; }
-  .title { font-size:18px; margin:0; }
-  .subtitle { font-size:14px; color:#a4a7c4; margin-top:2px; }
-
-  .icon-buttons { display:flex; gap:4px; }
-  .icon-btn {
-    width:30px; height:30px; border-radius:999px;
-    border:none; background:#191b30;
-    display:flex; align-items:center; justify-content:center;
-    padding:0; cursor:pointer;
-  }
-  .icon-btn svg { width:16px; height:16px; fill:#d7daff; }
-
-  input.amount-input, .savings-input {
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    font-size:16px;
-    margin-top:6px;
-    background:#191b30;
-    color:#fff;
-  }
-
-
-  .month-nav {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:10px;
-  }
-  .month-label {
-    flex:1;
-    text-align:center;
-    font-weight:600;
-    font-size:16px;
-  }
-  .nav-btn {
-    width:34px;
-    height:34px;
-    border-radius:999px;
-    border:none;
-    background:#191b30;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-    cursor:pointer;
-  }
-  .nav-btn svg {
-    width:18px;
-    height:18px;
-    fill:#d7daff;
-  }
-
-  .totals { margin-top:20px; }
-  .tot-card {
-    background:#111320;
-    padding:14px;
-    border-radius:16px;
-    margin-bottom:8px;
-    font-size:16px;
-  }
-  .green { color:#4be37f; }
-  .red { color:#ff4b4b; }
-  .blue { color:#4ba7ff; }
-
-  /* Savings list */
-  .savings-card-title { font-size:16px; margin-bottom:8px; color:#a4a7c4; }
-  .savings-row {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:6px 0; border-bottom:1px solid #1e2137;
-    font-size:14px;
-  }
-  .savings-row:last-child { border-bottom:none; }
-  .savings-label { color:#fff; }
-  .savings-type-deposit { color:#4be37f; }
-  .savings-type-withdrawal { color:#ff4b4b; }
-  .savings-remove {
-    border:none; background:transparent; color:#ff8080;
-    font-size:18px; cursor:pointer; padding:0 4px;
-  }
-
-  .savings-form select, .savings-form input {
-    width:100%; margin-top:6px;
-  }
-  .savings-form button {
-    margin-top:8px;
-    width:100%;
-    border:none;
-    border-radius:10px;
-    padding:10px;
-    background:#2f46ff;
-    color:#fff;
-    font-size:16px;
-    cursor:pointer;
-  }
-
-  /* Modal sheet */
-  .overlay {
-    position:fixed;
-    left:0; top:0; right:0; bottom:0;
-    background:rgba(0,0,0,0.55);
-    backdrop-filter:blur(5px);
-    display:none;
-  }
-  .sheet {
-    position:fixed;
-    left:0; right:0;
-    bottom:0;
-    background:#111320;
-    padding:20px;
-    border-radius:20px 20px 0 0;
-    box-shadow:0 -4px 30px rgba(0,0,0,0.6);
-    transform:translateY(100%);
-    transition:transform 0.25s ease-out;
-  }
-  .sheet.show { transform:translateY(0); }
-  .sheet h2 { margin-top:0; margin-bottom:12px; }
-  .sheet input, .sheet select {
-    width:100%; padding:12px; border:none; border-radius:10px;
-    margin-bottom:12px; font-size:16px; background:#191b30; color:#fff;
-  }
-  .sheet-btn {
-    background:#2f46ff; padding:12px; border:none; border-radius:10px;
-    font-size:18px; color:#fff; width:100%; margin-top:4px;
-  }
-  .close-btn {
-    background:#33384d; padding:12px; border:none; border-radius:10px;
-    font-size:16px; color:#fff; width:100%; margin-top:8px;
-  }
-
-  /* Year table */
-  table.year-table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size:14px;
-  }
-  .year-table th, .year-table td {
-    padding:6px 4px;
-    border-bottom:1px solid #1d2035;
-    text-align:right;
-  }
-  .year-table th:first-child,
-  .year-table td:first-child {
-    text-align:left;
-  }
-  .year-table tfoot td {
-    font-weight:bold;
-    border-top:1px solid #2a2d45;
-  }
-
-  .settings-card {
-    background:#111320;
-    padding:14px;
-    border-radius:16px;
-    margin-bottom:12px;
-  }
-  .settings-card label {
-    font-size:14px;
-    color:#a4a7c4;
-    display:block;
-    margin-bottom:4px;
-  }
-  .settings-card input {
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    background:#191b30;
-    color:#fff;
-  }
-  .settings-card button {
-  margin-top:8px;
-  width:100%;
-  border:none;
-  border-radius:10px;
-  padding:10px;
-  background:#2f46ff;
-  color:#fff;
-  font-size:15px;
-  cursor:pointer;
-}
-
-.year-nav { 
-  display:flex; 
-  align-items:center; 
-  justify-content:space-between; 
-  margin:10px 0; 
-}
-
-.year-title { 
-  font-size:18px; 
-  font-weight:600; 
-}
-
-</style>
+  <link rel="stylesheet" href="styles/app.css" />
 </head>
 <body>
+  <div class="app">
+    <h1>FinFlow</h1>
+    <div class="subtitle">Inkomen, uitgaven, sparen — automatisch door alle maanden en jaren.</div>
 
-<div class="tabs">
-  <div class="tab active" data-tab="categories">Categorieën</div>
-  <div class="tab" data-tab="month">Maand</div>
-  <div class="tab" data-tab="year">Jaar</div>
-</div>
+    <div class="tabs">
+      <div class="tab active" data-tab="categories">Categorieën</div>
+      <div class="tab" data-tab="month">Maand</div>
+      <div class="tab" data-tab="year">Jaar</div>
+    </div>
 
-<!-- Categorieën-tab -->
-<div id="tab-categories">
-  <button id="newCat" class="btn-main">Nieuwe categorie</button>
-  <div id="catList"></div>
-</div>
+    <!-- CATEGORIEËN TAB -->
+    <div id="tab-categories">
+      <button id="newCat" class="add-btn">+ Nieuwe categorie toevoegen</button>
+      <div id="catList"></div>
+    </div>
 
-<!-- Maand-tab -->
-<div id="tab-month" class="hidden">
-  <div class="month-nav">
-    <button id="monthPrev" class="nav-btn" aria-label="Vorige maand">
-      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-    </button>
-    <div class="month-label" id="monthTitle">Maand</div>
-    <button id="monthNext" class="nav-btn" aria-label="Volgende maand">
-      <svg viewBox="0 0 24 24"><path d="m10 6 1.41 1.41L8.83 12l2.58 2.59L10 16l-6-6z" transform="scale(-1,1) translate(-24,0)"/></svg>
-    </button>
-  </div>
-  <div id="monthList"></div>
+    <!-- MAAND TAB -->
+    <div id="tab-month" class="hidden">
+      <div class="month-header">
+        <button id="monthPrev" class="nav-btn">&lt;</button>
+        <div class="month-title" id="monthTitle"></div>
+        <button id="monthNext" class="nav-btn">&gt;</button>
+      </div>
 
-  <div class="totals">
-    <div class="tot-card"><strong class="green">INKOMEN:</strong> <span id="tIncome"></span></div>
-    <div class="tot-card"><strong class="red">UITGAVEN:</strong> <span id="tExpense"></span></div>
-    <div class="tot-card"><strong class="blue">BESCHIKBAAR:</strong> <span id="tAvail"></span></div>
-  </div>
+      <div id="monthCategories"></div>
 
-  <div class="card" style="margin-top:14px;">
-    <div class="savings-card-title">Spaaracties voor deze maand</div>
-    <div id="savingsList"></div>
-    <div class="savings-form">
-<div style="display:flex; gap:10px; align-items:center; margin-top:6px;">
-    <input id="sAmount" class="savings-input" placeholder="Bedrag" style="flex:1;">
+      <div class="card spaar-row">
+        <div class="card-header">
+          <div class="card-left">
+            <div class="tag-savings">SPAARACTIES IN DEZE MAAND</div>
+          </div>
+          <button id="addSavingAction" class="small-btn">+ Spaaractie</button>
+        </div>
 
-<div style="display:flex; gap:6px;">
-<div style="display:flex; gap:6px;">
-    <button id="sToggleDeposit" 
-            style="padding:6px 12px; border:none; background:#80ff80; color:#4ba7ff; border-radius:8px;">
-        Storting
-    </button>
+        <!-- Inline spaaractieformulier -->
+        <div id="savingForm" class="saving-form hidden">
+          <div class="saving-input-row">
+            <input id="savingAmountInput" class="inline-input" placeholder="Bedrag" />
+            <div class="saving-toggle-group">
+              <button id="savingToggleDeposit" class="toggle-saving">Storting</button>
+              <button id="savingToggleWithdrawal" class="toggle-saving">Opname</button>
+            </div>
+          </div>
+          <div class="btn-row saving-actions">
+            <button id="saveSavingBtn" class="primary-btn">Opslaan</button>
+            <button id="cancelSavingBtn" class="secondary-btn">Annuleren</button>
+          </div>
+        </div>
 
-    <button id="sToggleWithdrawal" 
-            style="padding:6px 12px; border:none; background:#191b30; color:#4ba7ff; border-radius:8px;">
-        Opname
-    </button>
-</div>
+        <div id="savingsList"></div>
+      </div>
 
-</div>
+      <div class="card">
+        <div class="section-title">Samenvatting maand</div>
+        <div class="summary-row">
+          <div class="summary-label">Totaal inkomen</div>
+          <div class="summary-value good" id="sumIncome"></div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Totaal uitgaven</div>
+          <div class="summary-value bad" id="sumExpense"></div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Beschikbaar</div>
+          <div class="summary-value neutral" id="sumAvailable"></div>
+        </div>
+      </div>
+    </div>
 
-</div>
-<input id="sNote" 
-       class="savings-input" 
-       placeholder="Omschrijving (optioneel)"
-       style="width:100%; box-sizing:border-box;">
-      <button id="sAdd">Spaaractie toevoegen</button>
+    <!-- JAAR TAB -->
+    <div id="tab-year" class="hidden">
+      <div class="year-nav">
+        <button id="prevYearBtn" class="icon-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
+        </button>
+        <div id="yearTitle" class="year-title"></div>
+        <button id="nextYearBtn" class="icon-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-size:12px; color:#a4a7c4; margin-bottom:4px;">
+          Deze waarden worden gebruikt als start voor bank- en spaarrekening in dit jaar.
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+          <input id="startingBankInput"
+            style="flex:1; padding:8px 10px; height:36px; border:none; border-radius:8px;
+                   background:#191b30; color:white; box-sizing:border-box;"
+            placeholder="Beginsaldo bankrekening (leeg = 0)">
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+          <input id="startingSavingsInput"
+            style="flex:1; padding:8px 10px; height:36px; border:none; border-radius:8px;
+                   background:#191b30; color:white; box-sizing:border-box;"
+            placeholder="Beginsaldo spaarrekening (leeg = 0)">
+        </div>
+
+        <div class="year-saving-row">
+          <input id="monthlySavingAmount"
+            placeholder="Maandelijks sparen (leeg = 0)"
+            class="year-saving-input">
+          <div class="year-saving-toggle-group">
+            <button id="yearToggleDeposit"
+              class="year-saving-toggle">
+              Storting
+            </button>
+            <button id="yearToggleWithdrawal"
+              class="year-saving-toggle">
+              Opname
+            </button>
+          </div>
+        </div>
+
+        <button id="saveSettingsBtn" class="save-settings-btn">Instellingen opslaan</button>
+      </div>
+
+      <div class="card">
+        <table class="year-grid" id="yearTable">
+          <thead>
+            <tr>
+              <th>Maand</th>
+              <th>Inkomen</th>
+              <th>Uitgaven</th>
+              <th>Beschikbaar</th>
+              <th>Eindsaldo bank</th>
+              <th>Eindsaldo spaar</th>
+            </tr>
+          </thead>
+          <tbody id="yearTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Jaar-tab -->
-<div id="tab-year" class="hidden">
-  <div class="year-nav">
-    <button id="prevYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-    <div id="yearTitle" class="year-title"></div>
-    <button id="nextYearBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
-  </div>
-    <div class="settings-card">
-<input id="startingBankInput" 
-       style="width:100%; box-sizing:border-box;" 
-       placeholder="Beginsaldo bankrekening (leeg = 0)">
+  <!-- CATEGORIE-SHEET -->
+  <div id="sheetOverlay" class="overlay">
+    <div id="sheetForm" class="sheet">
+      <h2 id="sheetTitle">Categorie</h2>
 
-<input id="startingSavingsInput" 
-       style="width:100%; box-sizing:border-box; margin-top:12px;" 
-       placeholder="Beginsaldo spaarrekening (leeg = 0)">
+      <input id="nameInput" placeholder="Naam" />
 
-  <div style="display:flex; gap:8px; margin-top:12px;">
-  <input id="monthlySavingAmount" placeholder="Maandelijks sparen (leeg = 0)" style="flex:1;">
-<div style="display:flex; gap:6px;">
-    <button id="yearToggleDeposit" 
-            style="padding:6px 12px; border:none; background:#80ff80; color:#4ba7ff; border-radius:8px;">
-        Storting
-    </button>
-    <button id="yearToggleWithdrawal" 
-            style="padding:6px 12px; border:none; background:#191b30; color:#4ba7ff; border-radius:8px;">
-        Opname
-    </button>
-</div>
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <span class="euro-label">€</span>
+        <input id="amountInput" placeholder="Standaard maandbedrag" style="flex:1;" />
 
+        <div class="toggle-row">
+          <button id="catToggleExpense">Uitgave</button>
+          <button id="catToggleIncome">Inkomen</button>
+        </div>
+      </div>
 
-  </div>
+      <input type="hidden" id="typeInput" value="expense" />
 
-  <button id="saveSettingsBtn">Instellingen opslaan</button>
-</div>
+      <div class="startyear-row">
+        <span class="startyear-label">Startjaar</span>
+        <input id="catStartYear" type="number" />
+      </div>
 
-
-  <div class="card">
-    <table class="year-table">
-  <thead>
-    <tr>
-      <th>Maand</th>
-      <th>In</th>
-      <th>Uit</th>
-      <th>Besch</th>
-      <th>Bank</th>
-      <th>Spaar</th>
-    </tr>
-  </thead>
-  <tbody id="yearBody"></tbody>
-  <tfoot>
-    <tr>
-      <td>Totaal</td>
-      <td id="yIncome"></td>
-      <td id="yExpense"></td>
-      <td id="yAvail"></td>
-      <td id="yBankEnd"></td>
-      <td id="yFictive"></td>
-    </tr>
-  </tfoot>
-</table>
-
-
-  </div>
-</div>
-
-<!-- Modal sheet -->
-<div id="overlay" class="overlay"></div>
-
-<div id="sheet" class="sheet">
-  <h2 id="sheetTitle">Categorie</h2>
-<input id="nameInput" 
-       placeholder="Naam"
-       style="width:100%; box-sizing:border-box;">
-<div style="display:flex; gap:10px; margin-top:8px;">
-    <input id="amountInput" placeholder="Standaard maandbedrag" style="flex:1;">
-
-    <div style="display:flex; gap:6px;">
-        <button id="catToggleExpense" 
-                style="padding:6px 12px; border:none; background:#ff8080; color:#4ba7ff; border-radius:8px;">
-            Uitgave
-        </button>
-
-        <button id="catToggleIncome" 
-                style="padding:6px 12px; border:none; background:#191b30; color:#4ba7ff; border-radius:8px;">
-            Inkomen
-        </button>
+      <button id="sheetSave" class="sheet-btn">Opslaan</button>
+      <button id="sheetClose" class="close-btn">Sluiten</button>
     </div>
-</div>
+  </div>
 
-
-<input type="hidden" id="typeInput" value="expense">
-  <button id="sheetSave" class="sheet-btn">Opslaan</button>
-  <button id="sheetClose" class="close-btn">Sluiten</button>
-</div>
-
-<script>
-  function nowMonth() {
-    var d = new Date();
-    var m = String(d.getMonth()+1);
-    if (m.length === 1) m = "0"+m;
-    return d.getFullYear() + "-" + m;
-  }
-  function monthName(n){
-    var arr=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
-    return arr[n-1] || "";
-  }
-
-  var currentMonthKey = nowMonth();
-  var currentYear = (new Date()).getFullYear();
-
-  var CAT_KEY = "simple_modal_type_v1";
-  var MONTH_KEY = "month_overwrite_v1";
-  var SAVINGS_KEY = "savings_actions_v1";
-  var SETTINGS_KEY = "app_settings_v1";
-
-  function loadCats(){
-    try{var r=localStorage.getItem(CAT_KEY);if(r)return JSON.parse(r);}catch(e){}
-    return [];
-  }
-  function saveCats(d){try{localStorage.setItem(CAT_KEY,JSON.stringify(d));}catch(e){}}
-
-  function loadMonthData(){
-    try{var r=localStorage.getItem(MONTH_KEY);if(r)return JSON.parse(r);}catch(e){}
-    return {};
-  }
-  function saveMonthData(d){try{localStorage.setItem(MONTH_KEY,JSON.stringify(d));}catch(e){}}
-
-function loadSavings(){
-    try{
-        var r = localStorage.getItem(SAVINGS_KEY);
-        if(r){
-            var parsed = JSON.parse(r);
-
-            // Als er GEEN categorieën en GEEN settings zijn → app is "verse start"
-            var cats = loadCats();
-            var settings = loadSettings();
-
-            var isFreshStart =
-                (!cats || cats.length === 0) &&
-                (!settings || (
-                    Object.keys(settings.yearStarting).length === 0 &&
-                    Object.keys(settings.yearBankStarting).length === 0 &&
-                    Object.keys(settings.yearMonthlySaving).length === 0
-                ));
-
-            if(isFreshStart){
-                // Reset ALLE spaaracties → voorkomt de 3000/2000 bug
-                return {};
-            }
-
-            return parsed;
-        }
-    }catch(e){}
-
-    return {};
-}
-
-  function saveSavings(d){try{localStorage.setItem(SAVINGS_KEY,JSON.stringify(d));}catch(e){}}
-
-  function loadSettings(){
-    try{
-      var r=localStorage.getItem(SETTINGS_KEY);
-      if(r) return JSON.parse(r);
-    }catch(e){}
-  return {
-  startingSavings: 0,
-  yearStarting: {},
-  yearBankStarting: {},
-  yearMonthlySaving: {}
-};
-
-  }
-  function saveSettings(s){
-    try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));}catch(e){}
-  }
-
-function resetCaches(){
-  _yearCache = {};
-  _monthCache = {};
-  _yearInProgress = {};
-}
-
-
-  function setMonthKeyFromParts(year, month){
-    // normalize month 1-12
-    while(month < 1){ month += 12; year -= 1; }
-    while(month > 12){ month -= 12; year += 1; }
-    var mStr = String(month);
-    if(mStr.length === 1) mStr = "0" + mStr;
-    currentMonthKey = String(year) + "-" + mStr;
-  }
-
-  function changeMonth(offset){
-    // currentMonthKey is 'YYYY-MM'
-    var parts = currentMonthKey.split("-");
-    var year = parseInt(parts[0], 10);
-    var month = parseInt(parts[1], 10);
-    if(isNaN(year) || isNaN(month)){
-      currentMonthKey = nowMonth();
-      parts = currentMonthKey.split("-");
-      year = parseInt(parts[0], 10);
-      month = parseInt(parts[1], 10);
-    }
-    month += offset;
-    setMonthKeyFromParts(year, month);
-    renderMonth();
-    // Jaaroverzicht opnieuw berekenen omdat fictief gespaard afhankelijk is van alle maanden
-    var active = document.querySelector(".tab.active");
-    if(active && active.getAttribute("data-tab") === "year"){
-      renderYear();
-    }
-  }
-
-  function changeYear(offset){
-    currentYear += offset;
-    renderYear();
-  }
-
-  // Navigatieknoppen voor maand
-// Swipe-functionaliteit verwijderd voor v71
-// Tabs
-  var tabs=document.querySelectorAll(".tab");
-  tabs.forEach(function(t){
-    t.addEventListener("click",function(){
-      tabs.forEach(function(x){x.classList.remove("active");});
-      this.classList.add("active");
-
-      document.getElementById("tab-categories").classList.add("hidden");
-      document.getElementById("tab-month").classList.add("hidden");
-      document.getElementById("tab-year").classList.add("hidden");
-
-      var target=this.getAttribute("data-tab");
-      document.getElementById("tab-"+target).classList.remove("hidden");
-
-      if(target==="month") renderMonth();
-      if(target==="year") renderYear();
-    });
-  });
-
-  // Modal
-  var overlay=document.getElementById("overlay");
-  var sheet=document.getElementById("sheet");
-  var editIndex=null;
-
-  function openSheet(index){
-    var cats=loadCats();
-    editIndex = (index===null || index===undefined) ? null : index;
-    var c = (editIndex!==null && cats[editIndex]) ? cats[editIndex] : {name:"",amount:"",type:"income"};
-
-    document.getElementById("sheetTitle").textContent = editIndex===null ? "Nieuwe categorie" : "Categorie bewerken";
-    document.getElementById("nameInput").value = c.name || "";
-    document.getElementById("amountInput").value = c.amount || "";
-    document.getElementById("typeInput").value = c.type || "income";
-
-// Toggle visueel instellen op basis van c.type
-var expBtn = document.getElementById("catToggleExpense");
-var incBtn = document.getElementById("catToggleIncome");
-
-if(c.type === "expense"){
-    expBtn.style.background = "#ff8080"; 
-    expBtn.style.color = "#4ba7ff";
-    incBtn.style.background = "#191b30";
-    incBtn.style.color = "#4ba7ff";
-} else {
-    incBtn.style.background = "#80ff80";
-    incBtn.style.color = "#4ba7ff";
-    expBtn.style.background = "#191b30";
-    expBtn.style.color = "#4ba7ff";
-}
-    overlay.style.display="block";
-    setTimeout(function(){sheet.classList.add("show");},10);
-  }
-  function closeSheet(){
-    sheet.classList.remove("show");
-    setTimeout(function(){overlay.style.display="none";},250);
-    editIndex=null;
-  }
-
-  document.getElementById("newCat").onclick=function(){openSheet(null);};
-  document.getElementById("sheetClose").onclick=closeSheet;
-  overlay.onclick=closeSheet;
-
-// Toggle inkomen/uitgave in categorie-sheet
-document.getElementById("catToggleExpense").onclick = function(){
-    document.getElementById("typeInput").value = "expense";
-this.style.background = "#ff8080";
-this.style.color = "#4ba7ff";
-document.getElementById("catToggleIncome").style.background = "#191b30";
-document.getElementById("catToggleIncome").style.color = "#4ba7ff";
-
-
-};
-
-document.getElementById("catToggleIncome").onclick = function(){
-    document.getElementById("typeInput").value = "income";
-this.style.background = "#80ff80";
-this.style.color = "#4ba7ff";
-document.getElementById("catToggleExpense").style.background = "#191b30";
-document.getElementById("catToggleExpense").style.color = "#4ba7ff";
-
-};
-
-  document.getElementById("sheetSave").onclick=function(){
-    var name=document.getElementById("nameInput").value.trim();
-    var amt=document.getElementById("amountInput").value.trim();
-    var typ=document.getElementById("typeInput").value;
-    if(!name){alert("Naam verplicht");return;}
-    var cats=loadCats();
-    if(editIndex!==null && cats[editIndex]){
-      cats[editIndex]={name:name,amount:amt,type:typ};
-    }else{
-      cats.push({name:name,amount:amt,type:typ});
-    }
-saveCats(cats);
-resetCaches();
-closeSheet();
-renderCategories();
-    var active=document.querySelector(".tab.active");
-    if(active && active.getAttribute("data-tab")==="month"){renderMonth();}
-    if(active && active.getAttribute("data-tab")==="year"){renderYear();}
-  };
-
-  function renderCategories(){
-    var list=document.getElementById("catList");
-    list.innerHTML="";
-    var cats=loadCats();
-    cats.forEach(function(c,idx){
-      var card=document.createElement("div");
-      card.className="card";
-
-      var header=document.createElement("div");
-      header.className="card-header";
-
-      var left=document.createElement("div");
-      left.className="card-left";
-
-      var tag=document.createElement("div");
-      tag.className="label " + (c.type==="income"?"income":"expense");
-      tag.textContent=c.type==="income"?"INKOMEN":"UITGAVE";
-      left.appendChild(tag);
-
-      var title=document.createElement("p");
-      title.className="title";
-      title.textContent=c.name+" — "+(c.amount||"0");
-      left.appendChild(title);
-
-      header.appendChild(left);
-
-      var icons=document.createElement("div");
-      icons.className="icon-buttons";
-
-      var editBtn=document.createElement("button");
-      editBtn.className="icon-btn";
-      editBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 17.25V20h2.75L17.81 8.94l-2.75-2.75L4 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-1.5-1.5a1.003 1.003 0 0 0-1.42 0L14.13 6.96l2.75 2.75 1.83-1.83z"/></svg>';
-      editBtn.onclick=function(){openSheet(idx);};
-      icons.appendChild(editBtn);
-
-      var delBtn=document.createElement("button");
-      delBtn.className="icon-btn";
-      delBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 7h12v2H6V7zm2 3h8v9H8v-9zm3-6h2v2h-2V4z"/></svg>';
-      delBtn.onclick=function(){
-        if(confirm("Categorie '"+c.name+"' verwijderen?")){
-          var cs=loadCats();
-          cs.splice(idx,1);
-          saveCats(cs);
-          renderCategories();
-          renderMonth();
-          renderYear();
-        }
-      };
-      icons.appendChild(delBtn);
-
-      header.appendChild(icons);
-      card.appendChild(header);
-
-      list.appendChild(card);
-    });
-  }
-
-  function renderMonth(){
-    var mKey=currentMonthKey;
-    document.getElementById("monthTitle").textContent="Maand: "+ monthName(parseInt(mKey.split("-")[1],10)) + " " + mKey.split("-")[0];
-    var cats=loadCats();
-    var md=loadMonthData();
-    if(!md[mKey]) md[mKey]={};
-    saveMonthData(md);
-
-    var list=document.getElementById("monthList");
-    list.innerHTML="";
-    var income=0,expense=0;
-
-    cats.forEach(function(c,idx){
-      var card=document.createElement("div");
-      card.className="card";
-
-      var header=document.createElement("div");
-      header.className="card-header";
-
-      var left=document.createElement("div");
-      left.className="card-left";
-
-      var tag=document.createElement("div");
-      tag.className="label "+(c.type==="income"?"income":"expense");
-      tag.textContent=c.type==="income"?"INKOMEN":"UITGAVE";
-      left.appendChild(tag);
-
-      var title=document.createElement("p");
-      title.className="title";
-      title.textContent=c.name;
-      left.appendChild(title);
-
-      var sub=document.createElement("div");
-      sub.className="subtitle";
-      sub.textContent="Standaard: "+(c.amount||"0");
-      left.appendChild(sub);
-
-      header.appendChild(left);
-      card.appendChild(header);
-
-      var inp=document.createElement("input");
-      inp.className="amount-input";
-      var stored = (md[mKey] && md[mKey][idx]!=null)? md[mKey][idx] : (c.amount||"0");
-      inp.value=stored;
-      inp.onchange=function(){
-        var cur=loadMonthData();
-        if(!cur[mKey]) cur[mKey]={};
-        cur[mKey][idx]=this.value;
-      saveMonthData(cur);
-      resetCaches();
-      renderMonth();
-      renderYear();
-
-      };
-      card.appendChild(inp);
-
-      var num=parseFloat(stored);
-      if(isNaN(num)) num=0;
-      if(c.type==="income") income+=num;
-      else expense+=num;
-
-      list.appendChild(card);
-    });
-
-    document.getElementById("tIncome").textContent=income.toFixed(0);
-    document.getElementById("tExpense").textContent=expense.toFixed(0);
-    // Spaaracties van deze maand meenemen in beschikbaar
-    var savings = loadSavings();
-    var arr = savings[mKey] || [];
-    var dep = 0, wdr = 0;
-    arr.forEach(function(a){
-      var n = parseFloat(a.amount);
-      if(isNaN(n)) n = 0;
-      if(a.type==="deposit") dep += n;
-      else if(a.type==="withdrawal") wdr += n;
-    });
-    var avail = income - expense - dep + wdr;
-    document.getElementById("tAvail").textContent=avail.toFixed(0);
-
-    renderSavingsList();
-  }
-
-  function renderSavingsList(){
-    var mKey=currentMonthKey;
-    var savings=loadSavings();
-    var listDiv=document.getElementById("savingsList");
-    listDiv.innerHTML="";
-    var arr=savings[mKey] || [];
-    if(!arr.length){
-      var p=document.createElement("p");
-      p.style.color="#a4a7c4";
-      p.style.fontSize="14px";
-      p.textContent="Nog geen spaaracties voor deze maand.";
-      listDiv.appendChild(p);
-      return;
-    }
-    arr.forEach(function(a,idx){
-      var row=document.createElement("div");
-      row.className="savings-row";
-      var left=document.createElement("div");
-      var typeSpan=document.createElement("span");
-      typeSpan.className = a.type==="deposit"?"savings-type-deposit":"savings-type-withdrawal";
-      typeSpan.textContent = a.type==="deposit"?"STORTING":"OPNAME";
-      left.appendChild(typeSpan);
-      var lbl=document.createElement("span");
-      lbl.className="savings-label";
-      lbl.textContent = " – " + (a.label||"");
-      left.appendChild(lbl);
-      row.appendChild(left);
-
-      var right=document.createElement("div");
-      right.textContent = a.amount;
-      var btn=document.createElement("button");
-      btn.className="savings-remove";
-      btn.textContent="×";
-      btn.onclick=function(){
-        var s=loadSavings();
-        var arr2=s[mKey]||[];
-        arr2.splice(idx,1);
-        s[mKey]=arr2;
-saveSavings(s);
-resetCaches();
-renderMonth();
-renderYear();
-
-
-      };
-      right.appendChild(btn);
-      row.appendChild(right);
-
-      listDiv.appendChild(row);
-    });
-  }
-
-// Toggle state (vervangt select sType)
-var monthlyType = "deposit";
-
-document.getElementById("sToggleDeposit").onclick = function(){
-    monthlyType = "deposit";
-    this.style.background = "#80ff80";
-    this.style.color = "#4ba7ff";
-    document.getElementById("sToggleWithdrawal").style.background = "#191b30";
-    document.getElementById("sToggleWithdrawal").style.color = "#4ba7ff";
-};
-
-document.getElementById("sToggleWithdrawal").onclick = function(){
-    monthlyType = "withdrawal";
-    this.style.background = "#ff8080";
-    this.style.color = "#4ba7ff";
-    document.getElementById("sToggleDeposit").style.background = "#191b30";
-    document.getElementById("sToggleDeposit").style.color = "#4ba7ff";
-};
-
-  document.getElementById("sAdd").onclick=function(){
-    var mKey=currentMonthKey;
-    var type = monthlyType;
-    var amountStr=document.getElementById("sAmount").value.trim();
-    var label=document.getElementById("sLabel").value.trim();
-    if(!amountStr){alert("Bedrag verplicht");return;}
-    var num=parseFloat(amountStr.replace(",", "."));
-    if(isNaN(num) || num<=0){alert("Ongeldig bedrag");return;}
-    var s=loadSavings();
-    if(!s[mKey]) s[mKey]=[];
-    s[mKey].push({type:type,amount:num,label:label});
-    saveSavings(s);
-    resetCaches();
-    document.getElementById("sAmount").value="";
-    document.getElementById("sLabel").value="";
-    renderMonth();
-    renderYear();
-  };
-
-  function computeMonthTotalsFor(year, monthIdx){
-    // Cache-key voor deze maand
-    var cacheKey = year + "-" + monthIdx;
-    if (_monthCache[cacheKey]) return _monthCache[cacheKey];
-
-    var mStr = String(monthIdx);
-    if(mStr.length===1) mStr="0"+mStr;
-    var mKey = year + "-" + mStr;
-
-    var cats = loadCats();
-    var md   = loadMonthData();
-    var s    = loadSavings();
-    var settings = loadSettings();
-    if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
-
-    var income = 0, expense = 0;
-    var overrides = md[mKey] || {};
-    cats.forEach(function(c, idx){
-      var valStr = overrides[idx]!=null ? overrides[idx] : (c.amount||"0");
-      var num = parseFloat(valStr);
-      if(isNaN(num)) num = 0;
-      if(c.type==="income") income += num;
-      else expense += num;
-    });
-
-    // Handmatige spaaracties
-    var deposits = 0, withdrawals = 0;
-    var arr = s[mKey] || [];
-    arr.forEach(function(a){
-      var n = parseFloat(a.amount);
-      if(isNaN(n)) n = 0;
-      if(a.type==="deposit") deposits += n;
-      else if(a.type==="withdrawal") withdrawals += n;
-    });
-
-// --------- Moderne maandelijkse spaaractie met ankerjaar ----------
-
-// Bepaal eerste jaar waarin de gebruiker een maandelijkse spaaractie heeft ingesteld
-var minMonthlyYear = null;
-for (var yStr in settings.yearMonthlySaving) {
-  var yNum = parseInt(yStr, 10);
-  if (!isNaN(yNum)) {
-    if (minMonthlyYear === null || yNum < minMonthlyYear) {
-      minMonthlyYear = yNum;
-    }
-  }
-}
-
-// Haal maandactie voor dit jaar op
-var yearlyDef = settings.yearMonthlySaving[year];
-
-// Alleen toepassen als:
-// 1. Er voor dit jaar een maandelijkse actie is
-// 2. We zitten op of na het ankerjaar
-// 3. De maand NIET locked is
-if (
-  yearlyDef &&
-  yearlyDef.amount &&
-  minMonthlyYear !== null &&
-  year >= minMonthlyYear &&
-  !isMonthClosed(year, monthIdx)
-) {
-  var defAmount = Number(yearlyDef.amount) || 0;
-
-  if (defAmount > 0) {
-    if (yearlyDef.type === "withdrawal") {
-      withdrawals += defAmount;
-    } else {
-      deposits += defAmount;
-    }
-  }
-}
-
-    // Beschikbaar blijft hier zoals in v71: na spaaracties
-    var available = income - expense - deposits + withdrawals;
-
-    var result = {
-      income: income,
-      expense: expense,
-      available: available,
-      deposits: deposits,
-      withdrawals: withdrawals
-    };
-
-    _monthCache[cacheKey] = result;
-    return result;
-  }
-
-// v74: bepaal of een maand "afgesloten" is
-// Een maand is afgesloten als:
-// - er maand-overrides zijn OF
-// - er spaaracties zijn
-function isMonthClosed(year, monthIdx){
-  var mStr = String(monthIdx);
-  if(mStr.length === 1) mStr = "0" + mStr;
-  var key = year + "-" + mStr;
-
-  var md = loadMonthData();
-  var s  = loadSavings();
-
-  var hasOverrides = md[key] && Object.keys(md[key]).length > 0;
-  var hasSavings   = s[key] && s[key].length > 0;
-
-  return !!(hasOverrides || hasSavings);
-}
-
-
-// v74: bereken eindstand bank en spaarrekening voor een jaar
-// --- v75 – correcte en veilige jaarberekening ---
-var _yearCache = {};
-var _monthCache = {};   // NIEUW: cache per maand
-var _yearInProgress = {};
-
-function computeYearEndState(year){
-  if (_yearCache[year]) return _yearCache[year];
-
-  if (_yearInProgress[year]) {
-    console.warn("Prevent infinite loop at year:", year);
-    return { bankEnd: 0, savingEnd: 0 };
-  }
-  _yearInProgress[year] = true;
-
-  var settings = loadSettings();
-  if(!settings.yearStarting) settings.yearStarting = {};
-  if(!settings.yearBankStarting) settings.yearBankStarting = {};
-  if(!settings.yearMonthlySaving) settings.yearMonthlySaving = {};
-
-  var prevYear = year - 1;
-
-// --- Savings doorrol met ankerjaar ---
-var savingStart;
-
-// Bepaal het eerste jaar waarin gebruiker een expliciet beginsaldo heeft gezet
-var minSavingsYear = null;
-for (var yStr in settings.yearStarting) {
-  var yNum = parseInt(yStr, 10);
-  if (!isNaN(yNum)) {
-    if (minSavingsYear === null || yNum < minSavingsYear) {
-      minSavingsYear = yNum;
-    }
-  }
-}
-
-if (settings.yearStarting[year] != null) {
-  // Handmatig beginsaldo ingevoerd
-  savingStart = Number(settings.yearStarting[year]);
-} else {
-  var prevY = year - 1;
-  if (minSavingsYear !== null && prevY >= minSavingsYear) {
-    // Doorrollen vanaf ankerjaar
-    var prev = computeYearEndState(prevY);
-    savingStart = Number(prev.savingEnd) || 0;
-  } else {
-    // Voor alle jaren vóór het ankerjaar
-    savingStart = 0;
-  }
-}
-
-// --- Bank doorrol (vereenvoudigd, robuust, altijd correct) ---
-if (settings.yearBankStarting[year] != null) {
-    bankStart = Number(settings.yearBankStarting[year]);
-} else {
-    // altijd doorrollen vanaf vorig jaar, tenzij er geen vorig jaar is
-    var prevStateB = computeYearEndState(year - 1);
-    bankStart = prevStateB ? (Number(prevStateB.bankEnd) || 0) : 0;
-}
-
-  var cumDep = 0;
-  var cumWdr = 0;
-  var bank = bankStart;
-
-  for (var m = 1; m <= 12; m++){
-    var t = computeMonthTotalsFor(year, m);
-    cumDep += t.deposits;
-    cumWdr += t.withdrawals;
-    bank   += t.available;
-  }
-
-  var savingEnd = savingStart + cumDep - cumWdr;
-
-  var result = {
-    bankEnd: bank,
-    savingEnd: savingEnd
-  };
-
-  _yearInProgress[year] = false;
-  _yearCache[year] = result;
-  return result;
-}
-  
-  function renderYear(){
-  var settings = loadSettings();
-  if(!settings.yearStarting){ settings.yearStarting = {}; }        // spaar
-  if(!settings.yearBankStarting){ settings.yearBankStarting = {}; } // bank
-  if(!settings.yearMonthlySaving){ settings.yearMonthlySaving = {}; }
-
-  var year = currentYear;
-
-// --- Savings doorrol voor UI met ankerjaar ---
-var start;
-
-// Eerste jaar met expliciet beginsaldo
-var minSavingsYear = null;
-for (var yStr in settings.yearStarting) {
-  var yNum = parseInt(yStr, 10);
-  if (!isNaN(yNum)) {
-    if (minSavingsYear === null || yNum < minSavingsYear) {
-      minSavingsYear = yNum;
-    }
-  }
-}
-
-if (settings.yearStarting[year] != null) {
-  start = Number(settings.yearStarting[year]);
-} else {
-  var prevY = year - 1;
-  if (minSavingsYear !== null && prevY >= minSavingsYear) {
-    var prevState = computeYearEndState(prevY);
-    start = prevState.savingEnd || 0;
-  } else {
-    start = 0;
-  }
-}
-
-  // Bank: beginsaldo
-  var baseBankStart = 0;
-  var bankStart;
-
-// --- Bank doorrol voor UI met ankerjaar ---
-var minBankYear = null;
-for (var yStr in settings.yearBankStarting) {
-  var yNum = parseInt(yStr, 10);
-  if (!isNaN(yNum)) {
-    if (minBankYear === null || yNum < minBankYear) {
-      minBankYear = yNum;
-    }
-  }
-}
-
-if (settings.yearBankStarting[year] != null) {
-  bankStart = Number(settings.yearBankStarting[year]);
-} else {
-  var prevY = year - 1;
-  if (minBankYear !== null && prevY >= minBankYear) {
-    var prevState = computeYearEndState(prevY);
-    bankStart = prevState.bankEnd || 0;
-  } else {
-    bankStart = 0;
-  }
-}
-
-  // Titel
-  var yt = document.getElementById("yearTitle");
-  if(yt){ yt.textContent = "Jaar: " + year; }
-
-  // Invulvelden
-  var startInput = document.getElementById("startingSavingsInput");
-if(startInput){ startInput.value = start !== 0 ? start : ""; }
-
-  var bankInput = document.getElementById("startingBankInput");
-if(bankInput){ bankInput.value = bankStart !== 0 ? bankStart : ""; }
-
-  // Maandelijkse spaaractie invullen
-  var ym = settings.yearMonthlySaving[year] || null;
-  var msAmount = document.getElementById("monthlySavingAmount");
-
-  // Tabel vullen
-  var body = document.getElementById("yearBody");
-  body.innerHTML = "";
-
-  var totInc  = 0;
-  var totExp  = 0;
-  var totAvail= 0;
-  var cumDep  = 0;
-  var cumWdr  = 0;
-
-  // v74: banksaldo door het jaar
-  var bank = bankStart;
-
-  for(var m = 1; m <= 12; m++){
-    var t = computeMonthTotalsFor(year, m);
-
-    totInc   += t.income;
-    totExp   += t.expense;
-    totAvail += t.available;
-    cumDep   += t.deposits;
-    cumWdr   += t.withdrawals;
-
-    // Spaarrekening (fictief gespaard)
-    var fictive = start + cumDep - cumWdr;
-
-    // Banksaldo eind van de maand
-    bank += t.available;
-
-    var tr = document.createElement("tr");
-
-    var tdM = document.createElement("td");
-    tdM.textContent = monthName(m);
-    tr.appendChild(tdM);
-
-    var tdI = document.createElement("td");
-    tdI.textContent = t.income.toFixed(0);
-    tr.appendChild(tdI);
-
-    var tdE = document.createElement("td");
-    tdE.textContent = t.expense.toFixed(0);
-    tr.appendChild(tdE);
-
-    var tdA = document.createElement("td");
-    tdA.textContent = t.available.toFixed(0);
-    tr.appendChild(tdA);
-
-    var tdB = document.createElement("td");
-    tdB.textContent = bank.toFixed(0);
-    tr.appendChild(tdB);
-
-    var tdF = document.createElement("td");
-    tdF.textContent = fictive.toFixed(0);
-    if(t.withdrawals > 0)      tdF.style.color = '#ff4b4b';
-    else if(t.deposits > 0)    tdF.style.color = 'lightgreen';
-    tr.appendChild(tdF);
-
-    body.appendChild(tr);
-  }
-
-  var finalFictive = start + cumDep - cumWdr;
-
-  var elInc  = document.getElementById("yIncome");
-  var elExp  = document.getElementById("yExpense");
-  var elAvail= document.getElementById("yAvail");
-  var elBank = document.getElementById("yBankEnd");
-  var elFict = document.getElementById("yFictive");
-
-  if(elInc)   elInc.textContent   = totInc.toFixed(0);
-  if(elExp)   elExp.textContent   = totExp.toFixed(0);
-  if(elAvail) elAvail.textContent = totAvail.toFixed(0);
-  if(elBank)  elBank.textContent  = bank.toFixed(0);
-  if(elFict)  elFict.textContent  = finalFictive.toFixed(0);
-}
-
-// ---- Toggle voor JAARTAB maandelijkse spaaractie ----
-var yearMonthlyType = "deposit"; 
-
-document.getElementById("yearToggleDeposit").onclick = function(){
-    yearMonthlyType = "deposit";
-this.style.background = "#80ff80";
-this.style.color = "#4ba7ff";
-document.getElementById("yearToggleWithdrawal").style.background = "#191b30";
-document.getElementById("yearToggleWithdrawal").style.color = "#4ba7ff";
-};
-
-document.getElementById("yearToggleWithdrawal").onclick = function(){
-    yearMonthlyType = "withdrawal";
-this.style.background = "#ff8080";
-this.style.color = "#4ba7ff";
-document.getElementById("yearToggleDeposit").style.background = "#191b30";
-document.getElementById("yearToggleDeposit").style.color = "#4ba7ff";
-};
-
-   document.getElementById("saveSettingsBtn").onclick = function(){
-  var s = loadSettings();
-  if(!s.yearStarting){ s.yearStarting = {}; }        // spaar
-  if(!s.yearBankStarting){ s.yearBankStarting = {}; } // bank
-  if(!s.yearMonthlySaving){ s.yearMonthlySaving = {}; }
-
-  // Beginsaldo bankrekening
-  var bankEl = document.getElementById("startingBankInput");
-  if(bankEl){
-    var valBank = bankEl.value.trim();
-    if(valBank !== ""){
-      var numBank = parseFloat(valBank.replace(",", "."));
-      if(isNaN(numBank)){
-        alert("Ongeldig beginsaldo bankrekening");
-        return;
-      }
-      s.yearBankStarting[currentYear] = numBank;
-    } else {
-      // leeg laten = default 0
-      delete s.yearBankStarting[currentYear];
-    }
-  }
-
-  // Beginsaldo spaarrekening
-  var savEl = document.getElementById("startingSavingsInput");
-  if(savEl){
-    var valStart = savEl.value.trim();
-    if(valStart !== ""){
-      var numStart = parseFloat(valStart.replace(",", "."));
-      if(isNaN(numStart)){
-        alert("Ongeldig beginsaldo spaarrekening");
-        return;
-      }
-      s.yearStarting[currentYear] = numStart;
-    } else {
-      // leeg laten = default 0
-      delete s.yearStarting[currentYear];
-    }
-  }
-
-  // Maandelijkse spaaractie (v75 fix: 0 is toegestaan)
-var msAmountEl = document.getElementById("monthlySavingAmount");
-  var msVal = msAmountEl.value.trim();
-
-if(msVal !== ""){
-    var msNum = parseFloat(msVal.replace(",", "."));
-    if(isNaN(msNum) || msNum < 0){
-      alert("Ongeldig bedrag voor maandelijkse spaaractie");
-      return;
-    }
-
-    // 0 mag → opslaan
-    s.yearMonthlySaving[currentYear] = {
-      amount: msNum,
-      type: yearMonthlyType
-    };
-
-} else {
-    // Leeg = verwijderen
-    delete s.yearMonthlySaving[currentYear];
-}
-
-// Nu ECHT opslaan
-saveSettings(s);
-resetCaches();
-renderYear();
-
-};
-
-  // Initial render
-  renderCategories();
-</script>
-
-
-<script>
-// herstelde DOMContentLoaded zonder swipe
-document.addEventListener("DOMContentLoaded", function(){
-  // Tabs
-  var tabs = document.querySelectorAll(".tab");
-  tabs.forEach(function(t){
-    t.addEventListener("click", function(){
-      tabs.forEach(function(x){ x.classList.remove("active"); });
-      this.classList.add("active");
-
-      var catPane  = document.getElementById("tab-categories");
-      var monthPane= document.getElementById("tab-month");
-      var yearPane = document.getElementById("tab-year");
-      if(catPane)  catPane.classList.add("hidden");
-      if(monthPane)monthPane.classList.add("hidden");
-      if(yearPane) yearPane.classList.add("hidden");
-
-      var target = this.getAttribute("data-tab");
-      var pane = document.getElementById("tab-" + target);
-      if(pane) pane.classList.remove("hidden");
-
-      if(target === "month"){ renderMonth(); }
-      if(target === "year"){ renderYear(); }
-    });
-  });
-
-  // Maandnavigatie
-  var prevBtn = document.getElementById("monthPrev");
-  var nextBtn = document.getElementById("monthNext");
-  if(prevBtn){
-    prevBtn.addEventListener("click", function(){ changeMonth(-1); });
-  }
-  if(nextBtn){
-    nextBtn.addEventListener("click", function(){ changeMonth(1); });
-  }
-
-  // Jaarnavigatie
-  var prevYearBtn = document.getElementById("prevYearBtn");
-  var nextYearBtn = document.getElementById("nextYearBtn");
-  if(prevYearBtn){
-    prevYearBtn.addEventListener("click", function(){ changeYear(-1); });
-  }
-  if(nextYearBtn){
-    nextYearBtn.addEventListener("click", function(){ changeYear(1); });
-  }
-
-  // Eerste render van alle tabbladen
-  renderCategories();
-  renderMonth();
-  renderYear();
-});
-
-</script>
-
+  <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

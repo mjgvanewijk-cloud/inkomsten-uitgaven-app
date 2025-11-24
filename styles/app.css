@@ -1,0 +1,522 @@
+html {
+  overflow-x:hidden;
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body {
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#050716;
+  color:#f5f7ff;
+  padding:16px;
+  overflow-x:hidden;
+}
+.app {
+  max-width:900px;
+  margin:0 auto;
+}
+h1 {
+  font-size:20px;
+  margin-bottom:12px;
+}
+.subtitle {
+  font-size:13px;
+  color:#a4a7c4;
+  margin-bottom:16px;
+}
+.tabs {
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+.tab {
+  flex:1;
+  text-align:center;
+  padding:8px 0;
+  border-radius:999px;
+  font-size:13px;
+  cursor:pointer;
+  background:#111325;
+  color:#a4a7c4;
+}
+.tab.active {
+  background:#2f46ff;
+  color:#fff;
+}
+.hidden {
+  display:none;
+}
+.card {
+  background:#0b0d1d;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+.card-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.card-left {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.label {
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+  display:inline-block;
+}
+.label.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.label.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+.card-title {
+  font-size:14px;
+}
+.card-amount {
+  font-size:16px;
+  font-weight:600;
+}
+.card-type {
+  font-size:11px;
+  color:#7e81a3;
+}
+.pill {
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
+}
+.pill.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.pill.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+.btn-row {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:8px;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.small-btn {
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:#111325;
+  color:#a4a7c4;
+}
+.small-btn.danger {
+  color:#ff8080;
+}
+.add-btn {
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px dashed #2f46ff;
+  color:#9ba4ff;
+  background:transparent;
+  margin-bottom:12px;
+  font-size:13px;
+}
+.section-title {
+  font-size:14px;
+  margin:10px 0 6px;
+  color:#e0e2ff;
+}
+.summary-row {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-top:2px;
+}
+.summary-label {
+  color:#a4a7c4;
+}
+.summary-value.good {
+  color:#72ff9f;
+}
+.summary-value.bad {
+  color:#ff8080;
+}
+.summary-value.neutral {
+  color:#e0e2ff;
+}
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:20;
+}
+.sheet {
+  width:100%;
+  max-width:500px;
+  background:#050716;
+  border-radius:16px 16px 0 0;
+  padding:16px;
+  transform:translateY(100%);
+  transition:transform 0.25s ease-out;
+
+  max-height:90vh;
+  overflow-y:auto;
+}
+.sheet.show {
+  transform:translateY(0);
+}
+#sheetTitle {
+  font-size:16px;
+  margin-bottom:10px;
+}
+.close-btn,
+.sheet-btn {
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+.sheet-btn {
+  background:#2f46ff;
+  color:#fff;
+}
+.close-btn {
+  background:#111325;
+  color:#a4a7c4;
+}
+#nameInput,
+#amountInput {
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  margin-bottom:8px;
+  font-size:14px;
+}
+#amountInput {
+  flex:1;
+}
+.toggle-row {
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.toggle-row button {
+  flex:1;
+  padding:6px 8px;
+  border-radius:999px;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* Categorie-toggle specifiek: rood/groen */
+#catToggleExpense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+#catToggleIncome {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+
+/* Maand-spaaractie toggle, stijl gelijkend aan jaar-tab */
+.toggle-saving {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+
+/* Jaar-spaaractie toggle */
+.year-saving-toggle {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+
+.month-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.month-title {
+  font-size:16px;
+}
+.nav-btn {
+  background:#111325;
+  border:none;
+  border-radius:999px;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:#a4a7c4;
+}
+.inline-input {
+  width:100%;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  font-size:13px;
+}
+.month-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin-top:8px;
+}
+.month-table th,
+.month-table td {
+  padding:4px 2px;
+  text-align:right;
+}
+.month-table th:first-child,
+.month-table td:first-child {
+  text-align:left;
+}
+.month-table th {
+  color:#a4a7c4;
+  border-bottom:1px solid #111325;
+}
+.tag-savings {
+  font-size:11px;
+  color:#72ff9f;
+}
+.spaar-row {
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid #111325;
+}
+.badge-lock {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  color:#ffca80;
+  background:#3b2a1b;
+  padding:2px 6px;
+  border-radius:999px;
+  margin-top:4px;
+}
+.year-nav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.year-title {
+  font-size:16px;
+}
+.icon-btn {
+  background:#111325;
+  border:none;
+  border-radius:999px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#a4a7c4;
+}
+.year-grid {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin-top:8px;
+}
+.year-grid th,
+.year-grid td {
+  padding:4px 2px;
+  text-align:right;
+}
+.year-grid th:first-child,
+.year-grid td:first-child {
+  text-align:left;
+}
+.year-grid th {
+  color:#a4a7c4;
+  border-bottom:1px solid #111325;
+}
+.settings-card {
+  background:#050716;
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+}
+.info-text {
+  font-size:11px;
+  color:#7e81a3;
+  margin-top:4px;
+}
+
+/* Saving form visuals */
+.saving-form {
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.saving-actions {
+  justify-content:space-between;
+}
+.primary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+.secondary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#111325;
+  color:#a4a7c4;
+  font-size:13px;
+}
+
+/* Verwijder-knoppen bij spaaracties iets compacter */
+.saving-delete-btn {
+  font-size:11px;
+  padding:3px 6px;
+}
+
+@media (min-width:700px) {
+  .app {
+    margin-top:16px;
+  }
+}
+
+
+/* Startjaar rij in sheet */
+.startyear-row {
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.startyear-label {
+  font-size:14px;
+  color:#a4a7c4;
+}
+#catStartYear {
+  width:140px;
+  height:36px;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+}
+
+/* Maand-spaaractie: input met knoppen erachter */
+.saving-input-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+.saving-form {
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.saving-actions {
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+/* Jaartab: spaaractie in één rij */
+.year-saving-row {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  align-items:center;
+}
+.year-saving-input {
+  flex:1;
+  height:36px;
+  padding:8px 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:white;
+  box-sizing:border-box;
+}
+.year-saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+
+/* Jaartab: instellingen opslaan knop volledig blauw */
+.save-settings-btn {
+  width:100%;
+  margin-top:14px;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+
+/* Verwijder-knoppen bij spaaracties iets compacter */
+.saving-delete-btn {
+  font-size:11px;
+  padding:3px 6px;
+}
+
+
+/* Euro label in category sheet */
+.euro-label {
+  font-size:13px;
+  color:#a4a7c4;
+  display:flex;
+  align-items:center;
+}
+
+/* Extra ruimte onder + Spaaractie knop naar lijst */
+#savingsList {
+  margin-top:10px;
+}
+
+input,button{font-size:16px !important;}
+
+.year-saving-row { display:flex; gap:6px; flex-wrap:nowrap; align-items:center; }
+.year-saving-toggle-group { display:flex; gap:6px; }
+.year-saving-toggle { white-space:nowrap; padding:0 8px; font-size:14px !important; }
+.year-saving-input { font-size:14px !important; }
+#startingBankInput, #startingSavingsInput, #monthlySavingAmount { font-size:14px !important; }
