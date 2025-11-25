@@ -220,11 +220,22 @@ function setupSheetEvents() {
       return;
     }
 
+    // Voorkom dubbele categorienamen (niet hoofdlettergevoelig).
+    const cats = loadCats();
+    const lowerName = name.toLowerCase();
+    const hasDuplicate = cats.some((c, idx) => {
+      const existing = (c.name || "").trim().toLowerCase();
+      return existing === lowerName && idx !== editIndex;
+    });
+    if (hasDuplicate) {
+      alert("Er bestaat al een categorie met deze naam. Kies een andere naam.");
+      return;
+    }
+
     let num = Number(amtRaw.replace(",", "."));
     if (isNaN(num)) num = 0;
     const normalized = num.toFixed(2);
 
-    const cats = loadCats();
     const newCat = { name, amount: normalized, type, startYear: startY };
 
     if (editIndex !== null && cats[editIndex]) {
