@@ -520,3 +520,66 @@ input,button{font-size:16px !important;}
 .year-saving-toggle { white-space:nowrap; padding:0 8px; font-size:14px !important; }
 .year-saving-input { font-size:14px !important; }
 #startingBankInput, #startingSavingsInput, #monthlySavingAmount { font-size:14px !important; }
+
+/* Added dotted borders for year table */
+.year-grid th, .year-grid td {
+  border: 1px dotted #2f46ff;
+}
+.year-grid {
+  border-collapse: collapse;
+}
+
+
+.year-grid th {
+  background: rgba(47,70,255,0.25);
+}
+.year-grid th:first-child {
+  border-top-left-radius: 12px;
+}
+.year-grid th:last-child {
+  border-top-right-radius: 12px;
+}
+.year-grid td, .year-grid th {
+  border: 1px dotted #2f46ff;
+}
+
+
+.year-grid td, .year-grid th {
+  /* remove general borders */
+  border: none;
+}
+.year-grid tr:last-child td:last-child {
+  border-right: 1px dotted rgba(47,70,255,0.25);
+}
+
+/* Clean, equal header/footer, no rounding, no card background */
+.year-grid {
+  border-collapse: collapse;
+  background: transparent;
+}
+.year-grid th {
+  background: rgba(47,70,255,0.25);
+  border: none;
+  border-top: 1px dotted #2f46ff;
+}
+.year-grid td, .year-grid th {
+  border: 1px dotted #2f46ff;
+}
+.year-grid tr:first-child th {
+  border-top: 1px dotted #2f46ff;
+}
+.year-grid tr:last-child td {
+  background: rgba(47,70,255,0.25);
+  border-top: 1px dotted #2f46ff;
+  border-bottom: 1px dotted #2f46ff;
+}
+
+.card { background: transparent !important; }
+
+/* Remove rounded corners from year table header */
+.year-grid th:first-child,
+.year-grid th:last-child {
+  border-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
