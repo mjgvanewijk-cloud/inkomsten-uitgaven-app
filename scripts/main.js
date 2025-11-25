@@ -3,6 +3,7 @@ import { initTabs } from "./ui.js";
 import { initCategoriesModule, renderCategories } from "./categories.js";
 import { initMonthModule, renderMonth } from "./month.js";
 import { initYearModule, renderYear } from "./year.js";
+import { initBackupModule } from "./backup.js";
 import { resetCaches } from "./state.js";
 
 function onDataChanged() {
@@ -23,4 +24,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initCategoriesModule(onDataChanged);
   initMonthModule(onDataChanged);
   initYearModule(onDataChanged);
+  initBackupModule(onDataChanged);
 });

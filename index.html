@@ -132,6 +132,17 @@
         </div>
 
         <button id="saveSettingsBtn" class="save-settings-btn">Instellingen opslaan</button>
+        <div class="section-title" style="margin-top:14px;">Backup</div>
+        <div class="info-text">Exporteer of importeer al je FinFlow-gegevens (categorieën, maanddata, instellingen).</div>
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+          <button id="exportDataBtn" class="small-btn" style="flex:1; text-align:center;">
+            Data exporteren
+          </button>
+          <button id="importDataBtn" class="small-btn" style="flex:1; text-align:center;">
+            Data importeren
+          </button>
+          <input type="file" id="importFileInput" accept="application/json" style="display:none;">
+        </div>
       </div>
 
       <div class="card">
