@@ -155,6 +155,23 @@ export function simulateYear(year) {
       }
     }
 
+    // Bepaal maandelijkse storting/opname spaarrekening (handmatig leading)
+    let monthSaving = 0;
+    if (t.hasManualSavings) {
+      // Handmatige spaaracties leidend: automatische spaaractie telt niet mee
+      monthSaving = t.deposits - t.withdrawals;
+    } else if (yms) {
+      if (yms.type === "deposit") {
+        monthSaving = t.deposits + yms.amount - t.withdrawals;
+      } else if (yms.type === "withdrawal") {
+        monthSaving = t.deposits - (t.withdrawals + yms.amount);
+      } else {
+        monthSaving = t.deposits - t.withdrawals;
+      }
+    } else {
+      monthSaving = t.deposits - t.withdrawals;
+    }
+
     cumDep += t.deposits + depExtra;
     cumWdr += t.withdrawals + wdrExtra;
     bank += availAdj;
@@ -168,6 +185,7 @@ export function simulateYear(year) {
       available: availAdj,
       bankEnd: bank,
       savingEnd,
+      monthSaving,
       hasManualSavings: t.hasManualSavings,
     });
   }

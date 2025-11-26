@@ -6,7 +6,6 @@ import {
 import {
   currentYear,
   setCurrentYear,
-  computeMonthTotalsFor,
   simulateYear,
   monthName,
   resetCaches,
@@ -136,7 +135,6 @@ export function renderYear() {
   const months = sim.months;
 
   // Bepaal december-eindsaldi
-  let lastAvail = 0;
   let lastBank = sim.bankStart;
   let lastFictive = sim.savingStart;
 
@@ -153,35 +151,13 @@ export function renderYear() {
     return "€\u00A0" + rounded.toString().replace(".", ",");
   };
 
+
   // Maandrijen opbouwen
   for (const mInfo of months) {
-    const { month, income, expense, available, bankEnd, savingEnd } = mInfo;
+    const { month, income, expense, available, bankEnd, savingEnd, monthSaving } = mInfo;
 
     totalIncome += income;
     totalExpense += expense;
-
-    // Bepaal maandelijkse storting/opname spaarrekening (handmatig leading)
-    let monthSaving = 0;
-
-    const t = computeMonthTotalsFor(year, month);
-    const yms = Object.prototype.hasOwnProperty.call(yearMonthlySaving, year)
-      ? yearMonthlySaving[year]
-      : null;
-
-    if (t) {
-      if (t.hasManualSavings) {
-        // Handmatige spaaracties leidend: automatische spaaractie telt niet mee
-        monthSaving = t.deposits - t.withdrawals;
-      } else if (yms) {
-        if (yms.type === "deposit") {
-          monthSaving = t.deposits + yms.amount - t.withdrawals;
-        } else if (yms.type === "withdrawal") {
-          monthSaving = t.deposits - (t.withdrawals + yms.amount);
-        }
-      } else {
-        monthSaving = t.deposits - t.withdrawals;
-      }
-    }
 
     totalSavingFlow += monthSaving;
 
@@ -196,6 +172,7 @@ export function renderYear() {
 
     const tdM = document.createElement("td");
     tdM.textContent = monthName(month);
+    tdM.style.textAlign = "left";
     tdM.style.fontWeight = "600";
     tr.appendChild(tdM);
 
@@ -241,7 +218,6 @@ export function renderYear() {
   }
 
   // Gebruik totalSavingFlow als jaarresultaat voor 'Storting spaar'
-  lastAvail = totalSavingFlow;
 
   // Totals row: inkomens/uitgaven = som, overige kolommen = eindsaldo december
   const totalRow = document.createElement("tr");
@@ -254,7 +230,7 @@ export function renderYear() {
   const isYearEmpty =
     totalIncome === 0 &&
     totalExpense === 0 &&
-    lastAvail === 0 &&
+    totalSavingFlow === 0 &&
     lastBank === 0 &&
     lastFictive === 0;
 
@@ -275,10 +251,10 @@ export function renderYear() {
   totalRow.appendChild(tdTotExp);
 
   const tdTotAvail = document.createElement("td");
-  tdTotAvail.textContent = formatAmount0(lastAvail);
+  tdTotAvail.textContent = formatAmount0(totalSavingFlow);
   tdTotAvail.style.fontWeight = "700";
-  if (!isYearEmpty && lastAvail !== 0) {
-    tdTotAvail.style.color = lastAvail > 0 ? "#72ff9f" : "#ff8080";
+  if (!isYearEmpty && totalSavingFlow !== 0) {
+    tdTotAvail.style.color = totalSavingFlow > 0 ? "#72ff9f" : "#ff8080";
   }
   totalRow.appendChild(tdTotAvail);
 
