@@ -12,7 +12,7 @@
 </head>
 <body>
   <div class="app">
-    <h1>FinFlow</h1>
+    <h1>FinFlow <span class="app-version">• v33</span></h1>
     <div class="subtitle">Inkomen, uitgaven, sparen — automatisch door alle maanden en jaren.</div>
 
     <div class="tabs">
@@ -160,6 +160,9 @@
           <tbody id="yearTableBody"></tbody>
         </table>
       </div>
+      <div class="info-text" style="margin-top:6px;">
+        "Storting spaar" toont per maand hoeveel er naar of van je spaarrekening gaat. Positief = storting, negatief = opname.
+      </div>
     </div>
   </div>
 
@@ -170,14 +173,9 @@
 
       <input id="nameInput" placeholder="Naam" />
 
-      <div style="display:flex; gap:10px; margin-top:8px;">
-        <span class="euro-label">€</span>
-        <input id="amountInput" placeholder="Standaard maandbedrag" style="flex:1;" />
-
-        <div class="toggle-row">
-          <button id="catToggleExpense">Uitgave</button>
-          <button id="catToggleIncome">Inkomen</button>
-        </div>
+      <div class="toggle-row toggle-row-top">
+        <button id="catToggleExpense">Uitgave</button>
+        <button id="catToggleIncome">Inkomen</button>
       </div>
 
       <input type="hidden" id="typeInput" value="expense" />
@@ -186,7 +184,17 @@
         <span class="startyear-label">Startjaar</span>
         <input id="catStartYear" type="number" />
       </div>
+      <div id="catStartYearHint" class="cat-hint"></div>
 
+      <div class="cat-year-block">
+        <div class="cat-year-header">
+          <span>Jaar</span>
+          <span>Standaard maandbedrag</span>
+        </div>
+        <div id="catYearAmountsRows"></div>
+        <button id="addCatYearBtn" class="secondary-btn full-width">Nieuw jaar toevoegen</button>
+        <div id="catYearHelp" class="cat-hint"></div>
+      </div>
       <button id="sheetSave" class="sheet-btn">Opslaan</button>
       <button id="sheetClose" class="close-btn">Sluiten</button>
     </div>
