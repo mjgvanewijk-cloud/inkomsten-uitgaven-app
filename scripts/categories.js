@@ -99,6 +99,24 @@ function deleteCategory(index) {
 
   cats.splice(index, 1);
   saveCats(cats);
+// FIX: Update monthData keys when renaming a category
+if (editIndex !== null && oldCatName && oldCatName !== name) {
+  const md = loadMonthData();
+  let changed = false;
+  for (const key in md) {
+    const entry = md[key];
+    if (entry && entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, oldName=oldCatName)) {
+      const val = entry.cats[oldName];
+      if (!Object.prototype.hasOwnProperty.call(entry.cats, name)) {
+        entry.cats[name] = val;
+      }
+      delete entry.cats[oldName];
+      changed = True
+    }
+  }
+  if (changed) saveMonthData(md);
+}
+
 
   const md = loadMonthData();
   for (const key in md) {
@@ -236,6 +254,8 @@ function setupSheetEvents() {
     if (isNaN(num)) num = 0;
     const normalized = num.toFixed(2);
 
+    const oldCatName = (editIndex !== null && cats[editIndex]) ? cats[editIndex].name : null;
+
     const newCat = { name, amount: normalized, type, startYear: startY };
 
     if (editIndex !== null && cats[editIndex]) {
@@ -245,6 +265,24 @@ function setupSheetEvents() {
     }
 
     saveCats(cats);
+// FIX: Update monthData keys when renaming a category
+if (editIndex !== null && oldCatName && oldCatName !== name) {
+  const md = loadMonthData();
+  let changed = false;
+  for (const key in md) {
+    const entry = md[key];
+    if (entry && entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, oldName=oldCatName)) {
+      const val = entry.cats[oldName];
+      if (!Object.prototype.hasOwnProperty.call(entry.cats, name)) {
+        entry.cats[name] = val;
+      }
+      delete entry.cats[oldName];
+      changed = True
+    }
+  }
+  if (changed) saveMonthData(md);
+}
+
     closeSheet();
     renderCategories();
     resetCaches();
