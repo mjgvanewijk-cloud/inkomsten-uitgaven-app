@@ -1,12 +1,12 @@
 // scripts/main.js
 import { initTabs } from "./ui.js";
-import { initCategoriesModule, renderCategories } from "./categories.js";
+import { setCategoriesChangeHandler, renderCategories } from "./categories.js";
 import { initMonthModule, renderMonth } from "./month.js";
 import { initYearModule, renderYear } from "./year.js";
 import { initBackupModule } from "./backup.js";
 import { resetCaches } from "./state.js";
 
-function onDataChanged() {
+function handleDataChanged() {
   resetCaches();
   const activeEl = document.querySelector(".tab.active");
   const activeTab = activeEl ? activeEl.getAttribute("data-tab") : null;
@@ -21,8 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tab === "year") renderYear();
   });
 
-  initCategoriesModule(onDataChanged);
-  initMonthModule(onDataChanged);
-  initYearModule(onDataChanged);
-  initBackupModule(onDataChanged);
+  setCategoriesChangeHandler(handleDataChanged);
+  initMonthModule(handleDataChanged);
+  initYearModule(handleDataChanged);
+  initBackupModule(handleDataChanged);
+
+  // Start in de huidige actieve tab (meestal categorieën of maand)
+  const activeEl = document.querySelector(".tab.active");
+  const activeTab = activeEl ? activeEl.getAttribute("data-tab") : "categories";
+  if (activeTab === "categories") renderCategories();
+  if (activeTab === "month") renderMonth();
+  if (activeTab === "year") renderYear();
 });
