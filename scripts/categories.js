@@ -52,7 +52,29 @@ export function renderCategories() {
 
     const amt = document.createElement("div");
     amt.className = "card-amount";
-    let num = parseFloat((c.amount ?? "").toString().replace(",", "."));
+    let rawVal = "";
+    if (c.amountsByYear && typeof c.amountsByYear === "object") {
+      const years = Object.keys(c.amountsByYear)
+        .map((k) => parseInt(k, 10))
+        .filter((y) => !Number.isNaN(y))
+        .sort((a, b) => a - b);
+      if (years.length > 0) {
+        const currentY = new Date().getFullYear();
+        let chosen = null;
+        for (const y of years) {
+          if (y <= currentY) {
+            chosen = y;
+          }
+        }
+        if (chosen === null) {
+          chosen = years[0];
+        }
+        rawVal = c.amountsByYear[String(chosen)];
+      }
+    } else {
+      rawVal = c.amount ?? "";
+    }
+    let num = parseFloat((rawVal ?? "").toString().replace(",", "."));
     if (isNaN(num)) num = 0;
     amt.textContent = "€ " + num.toFixed(2).replace(".", ",");
     right.appendChild(amt);
@@ -144,30 +166,126 @@ function updateTypeButtons(type) {
   }
 }
 
+
+function createYearRow(rowsContainer, year, rawAmount) {
+  const row = document.createElement("div");
+  row.className = "cat-year-row";
+
+  const yCol = document.createElement("div");
+  yCol.className = "cat-year-col-year";
+  const yField = document.createElement("input");
+  yField.type = "number";
+  yField.className = "cat-year-input";
+  yField.value = String(year);
+  yField.min = "1900";
+  yField.max = "2999";
+  yCol.appendChild(yField);
+
+  const aCol = document.createElement("div");
+  aCol.className = "cat-year-col-amount";
+  const aField = document.createElement("input");
+  aField.className = "cat-year-amount-input";
+  aField.placeholder = "Bedrag per maand";
+  if (rawAmount != null && rawAmount !== "") {
+    const num = Number(rawAmount.toString().replace(",", "."));
+    if (!Number.isNaN(num)) {
+      aField.value = num.toFixed(2).replace(".", ",");
+    } else {
+      aField.value = rawAmount;
+    }
+  }
+  aCol.appendChild(aField);
+
+  const delCol = document.createElement("div");
+  delCol.className = "cat-year-col-actions";
+  const delBtn = document.createElement("button");
+  delBtn.type = "button";
+  delBtn.className = "small-btn danger";
+  delBtn.textContent = "Verwijder jaar";
+  delBtn.onclick = () => {
+    rowsContainer.removeChild(row);
+  };
+  delCol.appendChild(delBtn);
+
+  row._yearInput = yField;
+  row._amountInput = aField;
+
+  row.appendChild(yCol);
+  row.appendChild(aCol);
+  row.appendChild(delCol);
+
+  rowsContainer.appendChild(row);
+}
+
 function openSheet(index) {
   const cats = loadCats();
   editIndex = index ?? null;
-  const c =
+  const currentY = new Date().getFullYear();
+
+  const base =
     editIndex !== null && cats[editIndex]
       ? cats[editIndex]
-      : { name: "", amount: "", type: "expense" };
+      : {
+          name: "",
+          type: "expense",
+          startYear: currentY,
+          amountsByYear: { [String(currentY)]: "0.00" },
+        };
 
   document.getElementById("sheetTitle").textContent =
     editIndex === null ? "Nieuwe categorie" : "Categorie bewerken";
-  document.getElementById("nameInput").value = c.name || "";
-  document.getElementById("amountInput").value = c.amount
-    ? (Number(c.amount).toFixed(2).replace(".", ","))
-    : "";
-  document.getElementById("typeInput").value = c.type || "expense";
+  document.getElementById("nameInput").value = base.name || "";
+  document.getElementById("typeInput").value = base.type || "expense";
 
-  const currentY = new Date().getFullYear();
   const yInput = document.getElementById("catStartYear");
-  yInput.value =
-    typeof c.startYear === "number" && !isNaN(c.startYear)
-      ? c.startYear
+  const startY =
+    typeof base.startYear === "number" && !isNaN(base.startYear)
+      ? base.startYear
       : currentY;
+  yInput.value = startY;
 
-  updateTypeButtons(c.type);
+  const startHint = document.getElementById("catStartYearHint");
+  if (startHint) {
+    startHint.textContent =
+      "Deze categorie telt mee vanaf " +
+      startY +
+      ". In eerdere jaren wordt hij niet automatisch meegenomen.";
+  }
+
+  const rowsContainer = document.getElementById("catYearAmountsRows");
+  if (rowsContainer) {
+    rowsContainer.innerHTML = "";
+    const years =
+      base.amountsByYear && typeof base.amountsByYear === "object"
+        ? Object.keys(base.amountsByYear)
+            .map((k) => parseInt(k, 10))
+            .filter((y) => !Number.isNaN(y))
+            .sort((a, b) => a - b)
+        : [];
+
+    if (years.length === 0) {
+      createYearRow(rowsContainer, startY, "");
+    } else {
+      years.forEach((y) => {
+        const key = String(y);
+        createYearRow(
+          rowsContainer,
+          y,
+          Object.prototype.hasOwnProperty.call(base.amountsByYear, key)
+            ? base.amountsByYear[key]
+            : ""
+        );
+      });
+    }
+  }
+
+  const yearHelp = document.getElementById("catYearHelp");
+  if (yearHelp) {
+    yearHelp.textContent =
+      "Stel per jaar het standaard maandbedrag in. Je kunt bedragen later per maand aanpassen in de Maand-tab.";
+  }
+
+  updateTypeButtons(base.type);
 
   overlay.style.display = "block";
   setTimeout(() => sheet.classList.add("show"), 10);
@@ -192,6 +310,17 @@ function setupSheetEvents() {
   });
   sheet.addEventListener("click", (e) => e.stopPropagation());
 
+  const addYearBtn = document.getElementById("addCatYearBtn");
+  if (addYearBtn) {
+    addYearBtn.type = "button";
+    addYearBtn.onclick = () => {
+      const rowsContainer = document.getElementById("catYearAmountsRows");
+      if (!rowsContainer) return;
+      const currentY = new Date().getFullYear();
+      createYearRow(rowsContainer, currentY, "");
+    };
+  }
+
   document.getElementById("catToggleExpense").onclick = () => {
     document.getElementById("typeInput").value = "expense";
     updateTypeButtons("expense");
@@ -205,7 +334,6 @@ function setupSheetEvents() {
   if (sheetSaveBtn) sheetSaveBtn.type = "button";
   sheetSaveBtn.onclick = () => {
     const name = document.getElementById("nameInput").value.trim();
-    const amtRaw = document.getElementById("amountInput").value.trim();
     const type = document.getElementById("typeInput").value;
     const yInput = document.getElementById("catStartYear");
     const currentY = new Date().getFullYear();
@@ -232,15 +360,46 @@ function setupSheetEvents() {
       return;
     }
 
-    let num = Number(amtRaw.replace(",", "."));
-    if (isNaN(num)) num = 0;
-    const normalized = num.toFixed(2);
+    // Lees jaarbedragen uit de UI
+    const rowsContainer = document.getElementById("catYearAmountsRows");
+    const rows = rowsContainer
+      ? Array.from(rowsContainer.getElementsByClassName("cat-year-row"))
+      : [];
+    const amountsByYear = {};
+    for (const row of rows) {
+      const yField = row._yearInput;
+      const aField = row._amountInput;
+      if (!yField || !aField) continue;
+
+      const yStr = (yField.value || "").trim();
+      if (!yStr) continue;
+      const yNum = parseInt(yStr, 10);
+      if (Number.isNaN(yNum) || yNum < 1900 || yNum > 2999) continue;
+
+      let raw = (aField.value || "").trim();
+      if (!raw) continue;
+      let num = Number(raw.replace(",", "."));
+      if (Number.isNaN(num)) num = 0;
+      const normalized = num.toFixed(2);
+
+      amountsByYear[String(yNum)] = normalized;
+    }
+
+    if (Object.keys(amountsByYear).length === 0) {
+      // Als er geen jaarbedragen zijn ingevuld, gebruik startjaar met 0 als basis.
+      amountsByYear[String(startY)] = "0.00";
+    }
 
     const oldCatName = (editIndex !== null && cats[editIndex])
       ? cats[editIndex].name
       : null;
 
-    const newCat = { name, amount: normalized, type, startYear: startY };
+    const newCat = {
+      name,
+      type,
+      startYear: startY,
+      amountsByYear,
+    };
 
     if (editIndex !== null && cats[editIndex]) {
       cats[editIndex] = newCat;
@@ -274,8 +433,3 @@ function setupSheetEvents() {
   };
 }
 
-export function initCategoriesModule(onChange) {
-  setCategoriesChangeHandler(onChange);
-  setupSheetEvents();
-  renderCategories();
-}
