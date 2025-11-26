@@ -350,9 +350,12 @@ h1 {
 }
 .year-grid {
   width:100%;
+  max-width:100%;
   border-collapse:collapse;
   font-size:12px;
   margin-top:8px;
+  margin-left:auto;
+  margin-right:auto;
 }
 .year-grid th,
 .year-grid td {

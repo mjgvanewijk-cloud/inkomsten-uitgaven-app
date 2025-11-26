@@ -142,10 +142,11 @@ export function renderYear() {
 
   if (months.length) {
     const last = months[months.length - 1];
-    lastAvail = last.available;
     lastBank = last.bankEnd;
     lastFictive = last.savingEnd;
   }
+
+  let totalSavingFlow = 0;
 
   const formatAmount0 = (val) => {
     const rounded = Math.round(val);
@@ -158,6 +159,31 @@ export function renderYear() {
 
     totalIncome += income;
     totalExpense += expense;
+
+    // Bepaal maandelijkse storting/opname spaarrekening (handmatig leading)
+    let monthSaving = 0;
+
+    const t = computeMonthTotalsFor(year, month);
+    const yms = Object.prototype.hasOwnProperty.call(yearMonthlySaving, year)
+      ? yearMonthlySaving[year]
+      : null;
+
+    if (t) {
+      if (t.hasManualSavings) {
+        // Handmatige spaaracties leidend: automatische spaaractie telt niet mee
+        monthSaving = t.deposits - t.withdrawals;
+      } else if (yms) {
+        if (yms.type === "deposit") {
+          monthSaving = t.deposits + yms.amount - t.withdrawals;
+        } else if (yms.type === "withdrawal") {
+          monthSaving = t.deposits - (t.withdrawals + yms.amount);
+        }
+      } else {
+        monthSaving = t.deposits - t.withdrawals;
+      }
+    }
+
+    totalSavingFlow += monthSaving;
 
     const isRowEmpty =
       income === 0 &&
@@ -188,13 +214,12 @@ export function renderYear() {
     }
     tr.appendChild(tdE);
 
-    const tdB = document.createElement("td");
-    tdB.textContent = formatAmount0(available);
-    if (!isRowEmpty) {
-      if (available > 0) tdB.style.color = "#72ff9f";
-      else if (available < 0) tdB.style.color = "#ff8080";
+    const tdS = document.createElement("td");
+    tdS.textContent = formatAmount0(monthSaving);
+    if (!isRowEmpty && monthSaving !== 0) {
+      tdS.style.color = monthSaving > 0 ? "#72ff9f" : "#ff8080";
     }
-    tr.appendChild(tdB);
+    tr.appendChild(tdS);
 
     const tdBank = document.createElement("td");
     tdBank.textContent = formatAmount0(bankEnd);
@@ -214,6 +239,9 @@ export function renderYear() {
 
     tbody.appendChild(tr);
   }
+
+  // Gebruik totalSavingFlow als jaarresultaat voor 'Storting spaar'
+  lastAvail = totalSavingFlow;
 
   // Totals row: inkomens/uitgaven = som, overige kolommen = eindsaldo december
   const totalRow = document.createElement("tr");
