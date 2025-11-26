@@ -35,32 +35,6 @@ export function monthName(m) {
   return arr[m - 1] || `m${m}`;
 }
 
-// Bepaal het standaard maandbedrag van een categorie voor een gegeven jaar.
-// Gebruikt amountsByYear indien aanwezig; valt terug op c.amount als er niets bekend is.
-function getCategoryAmountForYear(c, year) {
-  if (c && c.amountsByYear && typeof c.amountsByYear === "object") {
-    const years = Object.keys(c.amountsByYear)
-      .map((k) => parseInt(k, 10))
-      .filter((y) => !Number.isNaN(y))
-      .sort((a, b) => a - b);
-
-    if (years.length > 0) {
-      let chosen = null;
-      for (const y of years) {
-        if (y <= year) {
-          chosen = y;
-        }
-      }
-      if (chosen === null) {
-        chosen = years[0];
-      }
-      return c.amountsByYear[String(chosen)];
-    }
-  }
-
-  return c && c.amount != null ? c.amount : "";
-}
-
 // Per maand: totalen inclusief spaaracties van deze maand
 export function computeMonthTotalsFor(year, month) {
   const key = `${year}-${month < 10 ? "0" + month : month}`;
@@ -76,7 +50,7 @@ export function computeMonthTotalsFor(year, month) {
   cats.forEach((c) => {
     const valStr = entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, c.name)
       ? entry.cats[c.name]
-      : getCategoryAmountForYear(c, year);
+      : c.amount;
 
     const yearOfMonth = year;
 

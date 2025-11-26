@@ -8,41 +8,7 @@ export function loadCats() {
     const s = localStorage.getItem(STORAGE_KEY_CATS);
     if (!s) return [];
     const arr = JSON.parse(s);
-    if (!Array.isArray(arr)) return [];
-
-    const currentY = new Date().getFullYear();
-
-    return arr
-      .filter((raw) => raw && typeof raw === "object")
-      .map((raw) => {
-        const c = { ...raw };
-
-        // type normaliseren
-        if (c.type !== "income" && c.type !== "expense") {
-          c.type = "expense";
-        }
-
-        // amountsByYear normaliseren
-        if (!c.amountsByYear || typeof c.amountsByYear !== "object") {
-          const baseAmount = c.amount ?? "";
-          const yearKey =
-            typeof c.startYear === "number" && !isNaN(c.startYear)
-              ? String(c.startYear)
-              : String(currentY);
-          c.amountsByYear = { [yearKey]: baseAmount };
-        } else {
-          const fixed = {};
-          Object.keys(c.amountsByYear).forEach((k) => {
-            const y = parseInt(k, 10);
-            if (!Number.isNaN(y)) {
-              fixed[String(y)] = c.amountsByYear[k];
-            }
-          });
-          c.amountsByYear = fixed;
-        }
-
-        return c;
-      });
+    return Array.isArray(arr) ? arr : [];
   } catch {
     return [];
   }

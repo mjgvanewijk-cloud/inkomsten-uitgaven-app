@@ -1,6 +1,6 @@
 // scripts/categories.js
 import { loadCats, saveCats, loadMonthData, saveMonthData } from "./storage.js";
-import { resetCaches, currentYear } from "./state.js";
+import { resetCaches } from "./state.js";
 
 let editIndex = null;
 let onDataChanged = null;
@@ -52,24 +52,7 @@ export function renderCategories() {
 
     const amt = document.createElement("div");
     amt.className = "card-amount";
-    let rawVal = "";
-    if (c.amountsByYear && typeof c.amountsByYear === "object") {
-      const years = Object.keys(c.amountsByYear)
-        .map((k) => parseInt(k, 10))
-        .filter((y) => !Number.isNaN(y))
-        .sort((a, b) => a - b);
-      if (years.length > 0) {
-        let chosen = null;
-        for (const y of years) {
-          if (y <= currentYear) chosen = y;
-        }
-        if (chosen === null) chosen = years[0];
-        rawVal = c.amountsByYear[String(chosen)];
-      }
-    } else {
-      rawVal = c.amount ?? "";
-    }
-    let num = parseFloat((rawVal ?? "").toString().replace(",", "."));
+    let num = parseFloat((c.amount ?? "").toString().replace(",", "."));
     if (isNaN(num)) num = 0;
     amt.textContent = "€ " + num.toFixed(2).replace(".", ",");
     right.appendChild(amt);
@@ -161,110 +144,30 @@ function updateTypeButtons(type) {
   }
 }
 
-function createYearRow(container, year, rawAmount) {
-  const row = document.createElement("div");
-  row.className = "cat-year-row";
-
-  const yCol = document.createElement("div");
-  yCol.className = "cat-year-col-year";
-  const yField = document.createElement("input");
-  yField.type = "number";
-  yField.className = "cat-year-input";
-  yField.value = String(year);
-  yField.min = "1900";
-  yField.max = "2999";
-  yCol.appendChild(yField);
-
-  const aCol = document.createElement("div");
-  aCol.className = "cat-year-col-amount";
-  const aField = document.createElement("input");
-  aField.className = "cat-year-amount-input";
-  aField.placeholder = "Bedrag per maand";
-  if (rawAmount !== undefined && rawAmount !== null && rawAmount !== "") {
-    const num = Number(rawAmount.toString().replace(",", "."));
-    if (!Number.isNaN(num)) {
-      aField.value = num.toFixed(2).replace(".", ",");
-    } else {
-      aField.value = rawAmount;
-    }
-  }
-  aCol.appendChild(aField);
-
-  const delCol = document.createElement("div");
-  delCol.className = "cat-year-col-actions";
-  const delBtn = document.createElement("button");
-  delBtn.type = "button";
-  delBtn.className = "small-btn danger";
-  delBtn.textContent = "Verwijder jaar";
-  delBtn.onclick = () => {
-    container.removeChild(row);
-  };
-  delCol.appendChild(delBtn);
-
-  row.appendChild(yCol);
-  row.appendChild(aCol);
-  row.appendChild(delCol);
-
-  container.appendChild(row);
-}
-
 function openSheet(index) {
   const cats = loadCats();
   editIndex = index ?? null;
-  const base =
+  const c =
     editIndex !== null && cats[editIndex]
       ? cats[editIndex]
-      : { name: "", type: "expense", startYear: undefined, amountsByYear: {} };
-
-  const currentY = new Date().getFullYear();
+      : { name: "", amount: "", type: "expense" };
 
   document.getElementById("sheetTitle").textContent =
     editIndex === null ? "Nieuwe categorie" : "Categorie bewerken";
-  document.getElementById("nameInput").value = base.name || "";
-  document.getElementById("typeInput").value = base.type || "expense";
+  document.getElementById("nameInput").value = c.name || "";
+  document.getElementById("amountInput").value = c.amount
+    ? (Number(c.amount).toFixed(2).replace(".", ","))
+    : "";
+  document.getElementById("typeInput").value = c.type || "expense";
 
+  const currentY = new Date().getFullYear();
   const yInput = document.getElementById("catStartYear");
-  const startY =
-    typeof base.startYear === "number" && !isNaN(base.startYear)
-      ? base.startYear
+  yInput.value =
+    typeof c.startYear === "number" && !isNaN(c.startYear)
+      ? c.startYear
       : currentY;
-  yInput.value = startY;
 
-  const startHint = document.getElementById("catStartYearHint");
-  if (startHint) {
-    startHint.textContent =
-      "Deze categorie telt mee vanaf " +
-      startY +
-      ". In eerdere jaren wordt hij niet automatisch meegenomen.";
-  }
-
-  const rowsContainer = document.getElementById("catYearAmountsRows");
-  if (rowsContainer) {
-    rowsContainer.innerHTML = "";
-    const src = base.amountsByYear && typeof base.amountsByYear === "object"
-      ? base.amountsByYear
-      : {};
-    const years = Object.keys(src)
-      .map((k) => parseInt(k, 10))
-      .filter((y) => !Number.isNaN(y))
-      .sort((a, b) => a - b);
-
-    if (years.length === 0) {
-      createYearRow(rowsContainer, startY, "");
-    } else {
-      years.forEach((y) => {
-        createYearRow(rowsContainer, y, src[String(y)]);
-      });
-    }
-  }
-
-  const yearHelp = document.getElementById("catYearHelp");
-  if (yearHelp) {
-    yearHelp.textContent =
-      "Stel per jaar het standaard maandbedrag in. Je kunt bedragen later per maand aanpassen in de Maand-tab.";
-  }
-
-  updateTypeButtons(base.type || "expense");
+  updateTypeButtons(c.type);
 
   overlay.style.display = "block";
   setTimeout(() => sheet.classList.add("show"), 10);
@@ -278,52 +181,31 @@ function closeSheet() {
 
 function setupSheetEvents() {
   const newCatBtn = document.getElementById("newCat");
-  if (newCatBtn) {
-    newCatBtn.type = "button";
-    newCatBtn.onclick = () => openSheet(null);
-  }
-
+  if (newCatBtn) newCatBtn.type = "button";
+  newCatBtn.onclick = () => openSheet(null);
   const sheetCloseBtn = document.getElementById("sheetClose");
-  if (sheetCloseBtn) {
-    sheetCloseBtn.type = "button";
-    sheetCloseBtn.onclick = closeSheet;
-  }
+  if (sheetCloseBtn) sheetCloseBtn.type = "button";
+  sheetCloseBtn.onclick = closeSheet;
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) closeSheet();
   });
   sheet.addEventListener("click", (e) => e.stopPropagation());
 
-  const expBtn = document.getElementById("catToggleExpense");
-  const incBtn = document.getElementById("catToggleIncome");
-  if (expBtn) {
-    expBtn.onclick = () => {
-      document.getElementById("typeInput").value = "expense";
-      updateTypeButtons("expense");
-    };
-  }
-  if (incBtn) {
-    incBtn.onclick = () => {
-      document.getElementById("typeInput").value = "income";
-      updateTypeButtons("income");
-    };
-  }
-
-  const addYearBtn = document.getElementById("addCatYearBtn");
-  if (addYearBtn) {
-    addYearBtn.type = "button";
-    addYearBtn.onclick = () => {
-      const rowsContainer = document.getElementById("catYearAmountsRows");
-      if (!rowsContainer) return;
-      const currentY = new Date().getFullYear();
-      createYearRow(rowsContainer, currentY, "");
-    };
-  }
+  document.getElementById("catToggleExpense").onclick = () => {
+    document.getElementById("typeInput").value = "expense";
+    updateTypeButtons("expense");
+  };
+  document.getElementById("catToggleIncome").onclick = () => {
+    document.getElementById("typeInput").value = "income";
+    updateTypeButtons("income");
+  };
 
   const sheetSaveBtn = document.getElementById("sheetSave");
   if (sheetSaveBtn) sheetSaveBtn.type = "button";
   sheetSaveBtn.onclick = () => {
     const name = document.getElementById("nameInput").value.trim();
+    const amtRaw = document.getElementById("amountInput").value.trim();
     const type = document.getElementById("typeInput").value;
     const yInput = document.getElementById("catStartYear");
     const currentY = new Date().getFullYear();
@@ -338,6 +220,7 @@ function setupSheetEvents() {
       return;
     }
 
+    // Voorkom dubbele categorienamen (niet hoofdlettergevoelig).
     const cats = loadCats();
     const lowerName = name.toLowerCase();
     const hasDuplicate = cats.some((c, idx) => {
@@ -349,45 +232,15 @@ function setupSheetEvents() {
       return;
     }
 
-    const rowsContainer = document.getElementById("catYearAmountsRows");
-    const rows = rowsContainer
-      ? Array.from(rowsContainer.getElementsByClassName("cat-year-row"))
-      : [];
-    const amountsByYear = {};
-
-    for (const row of rows) {
-      const yField = row.querySelector(".cat-year-input");
-      const aField = row.querySelector(".cat-year-amount-input");
-      if (!yField || !aField) continue;
-
-      const yStr = (yField.value || "").trim();
-      if (!yStr) continue;
-      const yNum = parseInt(yStr, 10);
-      if (Number.isNaN(yNum) || yNum < 1900 || yNum > 2999) continue;
-
-      let raw = (aField.value || "").trim();
-      if (!raw) continue;
-      let num = Number(raw.replace(",", "."));
-      if (Number.isNaN(num)) num = 0;
-      const normalized = num.toFixed(2);
-
-      amountsByYear[String(yNum)] = normalized;
-    }
-
-    if (Object.keys(amountsByYear).length === 0) {
-      amountsByYear[String(startY)] = "0.00";
-    }
+    let num = Number(amtRaw.replace(",", "."));
+    if (isNaN(num)) num = 0;
+    const normalized = num.toFixed(2);
 
     const oldCatName = (editIndex !== null && cats[editIndex])
       ? cats[editIndex].name
       : null;
 
-    const newCat = {
-      name,
-      type,
-      startYear: startY,
-      amountsByYear,
-    };
+    const newCat = { name, amount: normalized, type, startYear: startY };
 
     if (editIndex !== null && cats[editIndex]) {
       cats[editIndex] = newCat;
@@ -396,7 +249,7 @@ function setupSheetEvents() {
     }
 
     saveCats(cats);
-
+    // Zorg dat maanddata meeverhuist als de categorienaam wijzigt
     if (editIndex !== null && oldCatName && oldCatName !== name) {
       const md = loadMonthData();
       let changed = false;
@@ -420,9 +273,6 @@ function setupSheetEvents() {
     if (typeof onDataChanged === "function") onDataChanged();
   };
 }
-
-
-export function initCategoriesModule
 
 export function initCategoriesModule(onChange) {
   setCategoriesChangeHandler(onChange);
