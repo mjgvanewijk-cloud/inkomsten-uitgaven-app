@@ -35,7 +35,6 @@ export function monthName(m) {
   return arr[m - 1] || `m${m}`;
 }
 
-
 // Bepaal het standaard maandbedrag van een categorie voor een gegeven jaar.
 // Gebruikt amountsByYear indien aanwezig; valt terug op c.amount als er niets bekend is.
 function getCategoryAmountForYear(c, year) {
@@ -52,14 +51,10 @@ function getCategoryAmountForYear(c, year) {
           chosen = y;
         }
       }
-
-      if (chosen !== null) {
-        return c.amountsByYear[String(chosen)];
+      if (chosen === null) {
+        chosen = years[0];
       }
-
-      // Als alle jaren groter zijn dan het gevraagde jaar:
-      // gebruik het vroegste bekende jaar als fallback.
-      return c.amountsByYear[String(years[0])];
+      return c.amountsByYear[String(chosen)];
     }
   }
 

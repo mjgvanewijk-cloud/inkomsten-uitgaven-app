@@ -3,7 +3,6 @@ export const STORAGE_KEY_CATS = "finflow_categories_v7";
 export const STORAGE_KEY_MONTH = "finflow_monthdata_v7";
 export const STORAGE_KEY_SETTINGS = "finflow_settings_v8";
 
-
 export function loadCats() {
   try {
     const s = localStorage.getItem(STORAGE_KEY_CATS);
@@ -18,7 +17,7 @@ export function loadCats() {
       .map((raw) => {
         const c = { ...raw };
 
-        // Zorg voor type
+        // type normaliseren
         if (c.type !== "income" && c.type !== "expense") {
           c.type = "expense";
         }
@@ -48,7 +47,6 @@ export function loadCats() {
     return [];
   }
 }
-
 
 export function saveCats(arr) {
   localStorage.setItem(STORAGE_KEY_CATS, JSON.stringify(arr));

@@ -618,22 +618,12 @@ input,button{font-size:16px !important;}
   margin-bottom: 6px;
 }
 
-.cat-year-header span:last-child {
-  text-align: right;
-}
-
 .cat-year-row {
   display: grid;
   grid-template-columns: 80px minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
   margin-bottom: 6px;
-}
-
-.cat-year-col-year {
-}
-
-.cat-year-col-amount {
 }
 
 .cat-year-col-actions {
