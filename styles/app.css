@@ -588,3 +588,16 @@ input,button{font-size:16px !important;}
 }
 
 .year-grid tr:last-child td:last-child { border-right:1px dotted #2f46ff; }
+
+
+#addCatYearBtn {
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px dashed #2f46ff;
+  color:#9ba4ff;
+  background:transparent;
+  margin:12px 0;
+  font-size:13px;
+  text-align:center;
+}
