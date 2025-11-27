@@ -166,7 +166,6 @@ function updateTypeButtons(type) {
   }
 }
 
-
 function createYearRow(rowsContainer, year, rawAmount) {
   const row = document.createElement("div");
   row.className = "cat-year-row";
@@ -185,7 +184,7 @@ function createYearRow(rowsContainer, year, rawAmount) {
   aCol.className = "cat-year-col-amount";
   const aField = document.createElement("input");
   aField.className = "cat-year-amount-input";
-  aField.placeholder="Bedrag";
+  aField.placeholder = "Bedrag";
   if (rawAmount != null && rawAmount !== "") {
     const num = Number(rawAmount.toString().replace(",", "."));
     if (!Number.isNaN(num)) {
@@ -243,6 +242,40 @@ function openSheet(index) {
       ? base.startYear
       : currentY;
   yInput.value = startY;
+
+  // --- Automatisch jaarregel syncen + hint updaten (alleen bij nieuwe categorie) ---
+  if (editIndex === null) {
+    yInput.addEventListener("blur", () => {
+      const newStart = parseInt(yInput.value, 10);
+      if (isNaN(newStart)) return;
+
+      const rowsContainer = document.getElementById("catYearAmountsRows");
+      if (!rowsContainer) return;
+
+      // Hinttekst updaten op basis van nieuwe startjaar
+      const startHintEl = document.getElementById("catStartYearHint");
+      if (startHintEl) {
+        startHintEl.textContent =
+          "Deze categorie telt mee vanaf " +
+          newStart +
+          ". In eerdere jaren wordt hij niet automatisch meegenomen.";
+      }
+
+      const rows = rowsContainer.getElementsByClassName("cat-year-row");
+
+      // Als er nog geen jaarregels zijn → maak er één
+      if (rows.length === 0) {
+        createYearRow(rowsContainer, newStart, "");
+        return;
+      }
+
+      // Anders: update de eerste jaarregel
+      const firstRow = rows[0];
+      if (firstRow && firstRow._yearInput) {
+        firstRow._yearInput.value = newStart;
+      }
+    });
+  }
 
   const startHint = document.getElementById("catStartYearHint");
   if (startHint) {
@@ -312,12 +345,35 @@ function setupSheetEvents() {
 
   const addYearBtn = document.getElementById("addCatYearBtn");
   if (addYearBtn) {
-    addYearBtn.type = "button"; addYearBtn.textContent = "+ Nieuw jaar toevoegen";
+    addYearBtn.type = "button";
+    addYearBtn.textContent = "+ Nieuw jaar toevoegen";
     addYearBtn.onclick = () => {
       const rowsContainer = document.getElementById("catYearAmountsRows");
       if (!rowsContainer) return;
-      const currentY = new Date().getFullYear();
-      createYearRow(rowsContainer, currentY, "");
+
+      // Verzamel alle bestaande jaren uit de UI
+      const rows = Array.from(
+        rowsContainer.getElementsByClassName("cat-year-row")
+      );
+      const years = rows
+        .map((r) => parseInt(r._yearInput.value, 10))
+        .filter((y) => !Number.isNaN(y))
+        .sort((a, b) => a - b);
+
+      // Als er geen jaren zijn → gebruik startYear
+      let newYear;
+      if (years.length === 0) {
+        const startY = parseInt(
+          document.getElementById("catStartYear").value,
+          10
+        );
+        newYear = startY;
+      } else {
+        // Anders: pak hoogste jaar + 1
+        newYear = years[years.length - 1] + 1;
+      }
+
+      createYearRow(rowsContainer, newYear, "");
     };
   }
 
@@ -356,7 +412,9 @@ function setupSheetEvents() {
       return existing === lowerName && idx !== editIndex;
     });
     if (hasDuplicate) {
-      alert("Er bestaat al een categorie met deze naam. Kies een andere naam.");
+      alert(
+        "Er bestaat al een categorie met deze naam. Kies een andere naam."
+      );
       return;
     }
 
@@ -390,9 +448,8 @@ function setupSheetEvents() {
       amountsByYear[String(startY)] = "0.00";
     }
 
-    const oldCatName = (editIndex !== null && cats[editIndex])
-      ? cats[editIndex].name
-      : null;
+    const oldCatName =
+      editIndex !== null && cats[editIndex] ? cats[editIndex].name : null;
 
     const newCat = {
       name,
@@ -414,7 +471,11 @@ function setupSheetEvents() {
       let changed = false;
       for (const key in md) {
         const entry = md[key];
-        if (entry && entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, oldCatName)) {
+        if (
+          entry &&
+          entry.cats &&
+          Object.prototype.hasOwnProperty.call(entry.cats, oldCatName)
+        ) {
           const val = entry.cats[oldCatName];
           if (!Object.prototype.hasOwnProperty.call(entry.cats, name)) {
             entry.cats[name] = val;
@@ -433,6 +494,6 @@ function setupSheetEvents() {
   };
 }
 
-
-
-export function initCategoriesModule(){ setupSheetEvents(); }
+export function initCategoriesModule() {
+  setupSheetEvents();
+}

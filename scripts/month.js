@@ -128,17 +128,32 @@ export function renderMonth() {
   // Render categorieën met euro en 2 decimalen
   cats.forEach((c) => {
     const cName = c.name;
-    let stored =
-      entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, cName)
-        ? entry.cats[cName]
-        : c.amount;
 
-    const yearOfMonth = year;
-    const include = !c.startYear || yearOfMonth >= c.startYear;
+let stored;
 
-    let num = Number((stored ?? "").toString().replace(",", "."));
-    if (isNaN(num)) num = 0;
-    const displayVal = num.toFixed(2).replace(".", ",");
+// 1. Eerst: maand-override (als gebruiker in Maandtab iets aanpast)
+if (entry.cats && Object.prototype.hasOwnProperty.call(entry.cats, cName)) {
+  stored = entry.cats[cName];
+}
+// 2. Anders: het jaarbedrag uit de categorie-tab voor het huidige jaar
+else if (c.amountsByYear && c.amountsByYear[String(year)]) {
+  stored = c.amountsByYear[String(year)];
+}
+// 3. Anders: geen bedrag
+else {
+  stored = "";
+}
+
+const yearOfMonth = year;
+const include = !c.startYear || yearOfMonth >= c.startYear;
+
+let displayVal = "";
+if (stored !== null && stored !== undefined && String(stored).trim() !== "") {
+  let num = Number(String(stored).replace(",", "."));
+  if (!isNaN(num)) {
+    displayVal = num.toFixed(2).replace(".", ",");
+  }
+}
 
     const card = document.createElement("div");
     card.className = "card";
@@ -199,7 +214,7 @@ export function renderMonth() {
       const msg = document.createElement("div");
       msg.style.fontSize = "11px";
       msg.style.color = "#7e81a3";
-      msg.textContent = `Niet van toepassing vóór ${c.startYear}`;
+      msg.textContent = `Geen bedrag ingesteld voor dit jaar (${year})`;
       card.appendChild(msg);
     }
 
