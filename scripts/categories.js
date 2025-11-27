@@ -185,7 +185,7 @@ function createYearRow(rowsContainer, year, rawAmount) {
   aCol.className = "cat-year-col-amount";
   const aField = document.createElement("input");
   aField.className = "cat-year-amount-input";
-  aField.placeholder = "Bedrag per maand";
+  aField.placeholder="Bedrag";
   if (rawAmount != null && rawAmount !== "") {
     const num = Number(rawAmount.toString().replace(",", "."));
     if (!Number.isNaN(num)) {
@@ -433,3 +433,6 @@ function setupSheetEvents() {
   };
 }
 
+
+
+export function initCategoriesModule(){ setupSheetEvents(); }
