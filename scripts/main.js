@@ -1,6 +1,6 @@
 // scripts/main.js
 import { initTabs } from "./ui.js";
-import { setCategoriesChangeHandler, renderCategories } from "./categories.js";
+import { setCategoriesChangeHandler, renderCategories, initCategoriesModule } from "./categories.js";
 import { initMonthModule, renderMonth } from "./month.js";
 import { initYearModule, renderYear } from "./year.js";
 import { initBackupModule } from "./backup.js";
@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tab === "month") renderMonth();
     if (tab === "year") renderYear();
   });
+
+  // Initialiseer categorie-sheet events (Nieuwe categorie, sluiten, opslaan, etc.)
+  initCategoriesModule();
 
   setCategoriesChangeHandler(handleDataChanged);
   initMonthModule(handleDataChanged);
