@@ -52,12 +52,19 @@ export function initYearModule(onChange) {
 }
 
 function setupYearNavigation() {
-  const prev = document.getElementById("prevYearBtn");
-  const next = document.getElementById("nextYearBtn");
-  if (prev) prev.addEventListener("click", () => changeYear(-1));
-  if (next) next.addEventListener("click", () => changeYear(1));
-}
+  const pill = document.getElementById("yearNavPill");
+  if (!pill) return;
 
+  pill.addEventListener("click", (e) => {
+    const rect = pill.getBoundingClientRect();
+    const isRight = (e.clientX - rect.left) > rect.width / 2;
+
+    changeYear(isRight ? 1 : -1);
+
+    pill.classList.add("nav-pill-active");
+    setTimeout(() => pill.classList.remove("nav-pill-active"), 120);
+  });
+}
 
 function setupYearButtons() {
   const depBtn = document.getElementById("yearToggleDeposit");

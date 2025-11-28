@@ -23,10 +23,18 @@ export function initMonthModule(onChange) {
 }
 
 function setupMonthNavigation() {
-  const prevBtn = document.getElementById("monthPrev");
-  const nextBtn = document.getElementById("monthNext");
-  if (prevBtn) prevBtn.addEventListener("click", () => changeMonth(-1));
-  if (nextBtn) nextBtn.addEventListener("click", () => changeMonth(1));
+  const pill = document.getElementById("monthNavPill");
+  if (!pill) return;
+
+  pill.addEventListener("click", (e) => {
+    const rect = pill.getBoundingClientRect();
+    const isRight = (e.clientX - rect.left) > rect.width / 2;
+
+    changeMonth(isRight ? 1 : -1);
+
+    pill.classList.add("nav-pill-active");
+    setTimeout(() => pill.classList.remove("nav-pill-active"), 120);
+  });
 }
 
 function setupSavingForm() {
