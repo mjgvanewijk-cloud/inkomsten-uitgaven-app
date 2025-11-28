@@ -97,23 +97,15 @@
       </div>
 
       <div class="settings-card">
-        <div style="font-size:12px; color:#a4a7c4; margin-bottom:4px;">
-          Deze waarden worden gebruikt als start voor bank- en spaarrekening in dit jaar.
-        </div>
 
-        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-          <input id="startingBankInput"
-            style="flex:1; padding:8px 10px; height:36px; border:none; border-radius:8px;
-                   background:#191b30; color:white; box-sizing:border-box;"
-            placeholder="Beginsaldo bankrekening (leeg = 0)">
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-          <input id="startingSavingsInput"
-            style="flex:1; padding:8px 10px; height:36px; border:none; border-radius:8px;
-                   background:#191b30; color:white; box-sizing:border-box;"
-            placeholder="Beginsaldo spaarrekening (leeg = 0)">
-        </div>
+<div class="startyear-row">
+  <span class="startyear-label">Beginsaldo bankrekening</span>
+  <input id="startingBankInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
+</div>
+<div class="startyear-row">
+  <span class="startyear-label">Beginsaldo spaarrekening</span>
+  <input id="startingSavingsInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
+</div>
 
         <div class="year-saving-row">
           <input id="monthlySavingAmount"
@@ -182,7 +174,7 @@
 
       <div class="startyear-row">
         <span class="startyear-label">Startjaar</span>
-        <input id="catStartYear" type="number" /> <span id="catStartYearHint" class="cat-hint"></span>
+        <input id="catStartYear" type="text" inputmode="decimal" pattern="[0-9.,]*" /> <span id="catStartYearHint" class="cat-hint"></span>
       </div>
       
 

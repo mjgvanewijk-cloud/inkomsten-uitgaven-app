@@ -878,3 +878,54 @@ input,button{font-size:16px !important;}
 .startyear-row + .cat-year-block {
   margin-top: 14px !important;
 }
+
+/* Zelfde look als categorie Startjaar */
+.startyear-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.startyear-label {
+  font-size: 14px;
+  color: #a4a7c4;
+  width: 180px;
+  display: inline-block;
+}
+
+.year-input {
+  flex: 1;
+  padding: 8px 10px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #191b30;
+  color: white;
+  box-sizing: border-box;
+}
+
+.year-input:focus {
+  outline: 2px solid #4ba7ff;
+}
+
+
+
+/* ============================================================
+   BEGIN — BREEDTE-INSTELLING BEGINSALDO VELDEN (BANK / SPAAR)
+   Pas onderstaande waardes zelf aan:
+   - width: totale breedte van het veld
+   - margin-left: verschuift het veld naar LINKS
+   Je kunt deze regels veilig aanpassen.
+   ============================================================ */
+
+#startingBankInput,
+#startingSavingsInput {
+    width: 180px !important;       /* totale breedte van veld */
+    margin-left: -08px !important; /* schuift naar links (vergroting links) */
+    max-width: none !important;
+}
+
+/* ============================================================
+   EINDE — BREEDTE-INSTELLING BEGINSALDO VELDEN
+   ============================================================ */

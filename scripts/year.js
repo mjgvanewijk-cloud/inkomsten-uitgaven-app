@@ -72,6 +72,13 @@ function setupYearButtons() {
   const saveBtn = document.getElementById("saveSettingsBtn");
   if (saveBtn) saveBtn.onclick = saveYearInputs;
 
+  // Bevestigingsvragen direct bij verlaten van de beginsaldo-velden
+  const startInput = document.getElementById("startingSavingsInput");
+  if (startInput) startInput.addEventListener("blur", handleSavingsBlur);
+
+  const bankInput = document.getElementById("startingBankInput");
+  if (bankInput) bankInput.addEventListener("blur", handleBankBlur);
+
   // Initial state based on current yearMonthlyType
   updateYearButtons(yearMonthlyType);
 }
@@ -100,9 +107,37 @@ export function renderYear() {
   const bankInput = document.getElementById("startingBankInput");
   const msAmount = document.getElementById("monthlySavingAmount");
 
-  // Alleen expliciete beginsaldi tonen; doorrol-waarden tonen als getal, maar blijven overschrijfbaar
-  if (startInput) startInput.value = savingStart !== 0 ? formatNumberInput(savingStart) : "";
-  if (bankInput) bankInput.value = bankStart !== 0 ? formatNumberInput(bankStart) : "";
+  // Bepaal of er expliciete beginsaldi zijn opgeslagen voor dit jaar
+  const hasExplicitSaving = Object.prototype.hasOwnProperty.call(yearStarting, year);
+  const hasExplicitBank = Object.prototype.hasOwnProperty.call(yearBankStarting, year);
+
+  if (startInput) {
+    if (hasExplicitSaving) {
+      const raw = yearStarting[year];
+      const num = typeof raw === "number" ? raw : Number(String(raw).replace(",", "."));
+      if (!isNaN(num)) {
+        startInput.value = formatNumberInput(num);
+      } else {
+        startInput.value = "";
+      }
+    } else {
+      startInput.value = savingStart !== 0 ? formatNumberInput(savingStart) : "";
+    }
+  }
+
+  if (bankInput) {
+    if (hasExplicitBank) {
+      const raw = yearBankStarting[year];
+      const num = typeof raw === "number" ? raw : Number(String(raw).replace(",", "."));
+      if (!isNaN(num)) {
+        bankInput.value = formatNumberInput(num);
+      } else {
+        bankInput.value = "";
+      }
+    } else {
+      bankInput.value = bankStart !== 0 ? formatNumberInput(bankStart) : "";
+    }
+  }
 
   const ym = Object.prototype.hasOwnProperty.call(yearMonthlySaving, year)
     ? yearMonthlySaving[year]
@@ -279,39 +314,105 @@ export function renderYear() {
 
 
 
-function saveYearInputs() {
+
+function handleSavingsBlur() {
+  const sInput = document.getElementById("startingSavingsInput");
+  if (!sInput) return;
+
   const settings = loadSettings();
   const year = currentYear;
 
-  // Bepaal de huidige doorrol-beginsaldi (inclusief bestaande overrides)
   const sim = simulateYear(year);
-  const defaultSavingStart = sim.savingStart;
-  const defaultBankStart = sim.bankStart;
+  const prev = sim.savingStart;
+  const prevIsZero = prev === 0;
 
-  const sInput = document.getElementById("startingSavingsInput");
-  if (sInput) {
-    let v = sInput.value.trim();
-    let num = Number(v.replace(",", "."));
-    if (v === "" || isNaN(num)) {
-      // leeg veld -> geen expliciete override
-      delete settings.yearStarting[year];
-    } else {
-      // altijd opslaan wat de gebruiker opgeeft
-      settings.yearStarting[year] = num;
+  let v = sInput.value.trim();
+  let num = Number(v.replace(",", "."));
+
+  let changed = false;
+  if (v === "" && !prevIsZero) {
+    changed = true;
+  } else if (v !== "") {
+    if (!isNaN(num) && num !== prev) {
+      changed = true;
     }
   }
 
+  if (!changed) return;
+
+  const ok = confirm("Weet je zeker dat je het beginsaldo spaarrekening wilt aanpassen?");
+  if (!ok) {
+    if (prevIsZero) {
+      sInput.value = "";
+    } else {
+      sInput.value = formatNumberInput(prev);
+    }
+    return;
+  }
+
+  if (v === "" || isNaN(num)) {
+    delete settings.yearStarting[year];
+  } else {
+    settings.yearStarting[year] = num;
+  }
+
+  saveSettings(settings);
+  resetCaches();
+  renderYear();
+  if (typeof onDataChanged === "function") onDataChanged();
+}
+
+function handleBankBlur() {
   const bInput = document.getElementById("startingBankInput");
-  if (bInput) {
-    let v = bInput.value.trim();
-    let num = Number(v.replace(",", "."));
-    if (v === "" || isNaN(num)) {
-      delete settings.yearBankStarting[year];
-    } else {
-      // altijd opslaan wat de gebruiker opgeeft
-      settings.yearBankStarting[year] = num;
+  if (!bInput) return;
+
+  const settings = loadSettings();
+  const year = currentYear;
+
+  const sim = simulateYear(year);
+  const prev = sim.bankStart;
+  const prevIsZero = prev === 0;
+
+  let v = bInput.value.trim();
+  let num = Number(v.replace(",", "."));
+
+  let changed = false;
+  if (v === "" && !prevIsZero) {
+    changed = true;
+  } else if (v !== "") {
+    if (!isNaN(num) && num !== prev) {
+      changed = true;
     }
   }
+
+  if (!changed) return;
+
+  const ok = confirm("Weet je zeker dat je het beginsaldo bankrekening wilt aanpassen?");
+  if (!ok) {
+    if (prevIsZero) {
+      bInput.value = "";
+    } else {
+      bInput.value = formatNumberInput(prev);
+    }
+    return;
+  }
+
+  if (v === "" || isNaN(num)) {
+    delete settings.yearBankStarting[year];
+  } else {
+    settings.yearBankStarting[year] = num;
+  }
+
+  saveSettings(settings);
+  resetCaches();
+  renderYear();
+  if (typeof onDataChanged === "function") onDataChanged();
+}
+
+
+function saveYearInputs() {
+  const settings = loadSettings();
+  const year = currentYear;
 
   const msInput = document.getElementById("monthlySavingAmount");
   if (msInput) {
@@ -333,3 +434,9 @@ function saveYearInputs() {
   renderYear();
   if (typeof onDataChanged === "function") onDataChanged();
 }
+
+
+
+// expose handlers globally
+window.handleBankBlur = handleBankBlur;
+window.handleSavingsBlur = handleSavingsBlur;
