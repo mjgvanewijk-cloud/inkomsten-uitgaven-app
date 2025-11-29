@@ -62,16 +62,21 @@ function setupSavingForm() {
       depBtn.style.color = "#4ba7ff";
       wdrBtn.style.background = "#191b30";
       wdrBtn.style.color = "#4ba7ff";
+      depBtn.dataset.active = "1";
+      wdrBtn.dataset.active = "0";
     } else {
       // Opname rood
       wdrBtn.style.background = "#ff8080";
       wdrBtn.style.color = "#4ba7ff";
       depBtn.style.background = "#191b30";
       depBtn.style.color = "#4ba7ff";
+      depBtn.dataset.active = "0";
+      wdrBtn.dataset.active = "1";
     }
   }
 
-  addBtn.onclick = () => {
+
+addBtn.onclick = () => {
     form.classList.remove("hidden");
     document.getElementById("savingAmountInput").value = "";
     updateTypeButtons("deposit");

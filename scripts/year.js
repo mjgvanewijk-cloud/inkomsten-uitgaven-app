@@ -2,6 +2,8 @@
 import {
   loadSettings,
   saveSettings,
+  loadMonthData,
+  saveMonthData,
 } from "./storage.js";
 import {
   currentYear,
@@ -9,6 +11,8 @@ import {
   simulateYear,
   monthName,
   resetCaches,
+  currentMonthKey,
+  setCurrentMonthKey,
 } from "./state.js";
 
 let onDataChanged = null;
@@ -233,12 +237,91 @@ export function renderYear() {
     }
     tr.appendChild(tdE);
 
-    const tdS = document.createElement("td");
-    tdS.textContent = formatAmount0(monthSaving);
-    if (!isRowEmpty && monthSaving !== 0) {
-      tdS.style.color = monthSaving > 0 ? "#72ff9f" : "#ff8080";
+const tdS = document.createElement("td");
+tdS.classList.add("saving-cell");
+tdS.innerHTML = `<span class="saving-text">${formatAmount0(monthSaving)}</span>
+  <svg class="edit-icon" width="14" height="14" viewBox="0 0 24 24" fill="#72ff9f">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.29a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+  </svg>`;
+
+// kleur behouden zoals origineel
+if (!isRowEmpty && monthSaving !== 0) {
+  tdS.style.color = monthSaving > 0 ? "#72ff9f" : "#ff8080";
+}
+
+tdS.onclick = () => {
+  const yearNum = currentYear;
+  const mStr = mInfo.month.toString().padStart(2, "0");
+  const key = `${yearNum}-${mStr}`;
+  setCurrentMonthKey(key);
+
+  const overlay = document.getElementById("savingOverlay");
+  const form = document.getElementById("savingForm");
+  const amount = document.getElementById("savingAmountInput");
+
+  if (overlay) overlay.classList.remove("hidden");
+  if (form) form.classList.remove("hidden");
+
+  // Bedrag zonder min-teken in popup
+  amount.value = Math.abs(monthSaving) || "";
+
+  const depBtn = document.getElementById("savingToggleDeposit");
+  const wdrBtn = document.getElementById("savingToggleWithdrawal");
+
+  // Toggle automatisch obv teken van bedrag
+  if (monthSaving > 0) {
+    if (depBtn) depBtn.click();
+  } else if (monthSaving < 0) {
+    if (wdrBtn) wdrBtn.click();
+  } else {
+    if (depBtn) depBtn.click();
+  }
+
+  const saveBtn = document.getElementById("saveSavingBtn");
+  const origSave = saveBtn.onclick;
+  saveBtn.onclick = () => {
+    let val = amount.value.trim().replace(",", ".");
+    let num = Number(val);
+    if (isNaN(num) || num < 0) {
+      alert("Ongeldig bedrag");
+      return;
     }
-    tr.appendChild(tdS);
+
+    let md = loadMonthData();
+    if (!md[key]) md[key] = { cats: {}, savings: [] };
+    if (!Array.isArray(md[key].savings)) md[key].savings = [];
+
+    // B1: alles vervangen door één nieuwe actie (of geen bij 0)
+    md[key].savings = [];
+    if (num > 0) {
+      // bepaal type obv dataset-active (wordt in month.js gezet)
+      let activeType = "deposit";
+      if (depBtn && depBtn.dataset && depBtn.dataset.active === "0") {
+        activeType = "withdrawal";
+      }
+      md[key].savings.push({ type: activeType, amount: num });
+    }
+
+    saveMonthData(md);
+    form.classList.add("hidden");
+    if (overlay) overlay.classList.add("hidden");
+    resetCaches();
+    if (typeof onDataChanged === "function") onDataChanged();
+
+    // oorspronkelijke handler herstellen
+    saveBtn.onclick = origSave;
+  };
+
+  const cancelBtn = document.getElementById("cancelSavingBtn");
+  const origCancel = cancelBtn.onclick;
+  cancelBtn.onclick = () => {
+    form.classList.add("hidden");
+    if (overlay) overlay.classList.add("hidden");
+    cancelBtn.onclick = origCancel;
+  };
+};
+
+tr.appendChild(tdS);
 
     const tdBank = document.createElement("td");
     tdBank.textContent = formatAmount0(bankEnd);

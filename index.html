@@ -9,8 +9,37 @@
   <link rel="icon" href="icons/icon-512.png" type="image/png" />
 
   <link rel="stylesheet" href="styles/app.css" />
+
+  <style>
+    .saving-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 900;
+    }
+    .saving-form {
+      position: relative;
+      z-index: 1000;
+    }
+  </style>
+
+<style>
+td.saving-cell:hover {
+  background: rgba(114,255,159,0.18);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.edit-icon {
+  opacity: 1;
+  margin-left: 6px;
+  transition: opacity 0.15s ease;
+  vertical-align: middle;
+}
+</style>
+
 </head>
 <body>
+<div id="savingOverlay" class="saving-overlay hidden"></div>
   <div class="app">
     <h1>FinFlow</h1>
     <div class="subtitle">Inkomen, uitgaven, sparen — automatisch door alle maanden en jaren.</div>
@@ -49,21 +78,6 @@
           <button id="addSavingAction" class="small-btn">+ Spaaractie</button>
         </div>
 
-        <!-- Inline spaaractieformulier -->
-        <div id="savingForm" class="saving-form hidden">
-          <div class="saving-input-row">
-            <input id="savingAmountInput" class="inline-input" placeholder="Bedrag" />
-            <div class="saving-toggle-group">
-              <button id="savingToggleDeposit" class="toggle-saving">Storting</button>
-              <button id="savingToggleWithdrawal" class="toggle-saving">Opname</button>
-            </div>
-          </div>
-          <div class="btn-row saving-actions">
-            <button id="saveSavingBtn" class="primary-btn">Opslaan</button>
-            <button id="cancelSavingBtn" class="secondary-btn">Annuleren</button>
-          </div>
-        </div>
-
         <div id="savingsList"></div>
       </div>
 
@@ -85,7 +99,23 @@
     </div>
 
     <!-- JAAR TAB -->
-    <div id="tab-year" class="hidden">
+<!-- Globaal spaaractieformulier -->
+<div id="savingForm" class="saving-form hidden">
+  <div class="saving-input-row">
+    <input id="savingAmountInput" class="inline-input" placeholder="Bedrag" type="number" inputmode="decimal" />
+    <div class="saving-toggle-group">
+      <button id="savingToggleDeposit" class="toggle-saving">Storting</button>
+      <button id="savingToggleWithdrawal" class="toggle-saving">Opname</button>
+    </div>
+  </div>
+
+  <div class="btn-row saving-actions">
+    <button id="saveSavingBtn" class="primary-btn">Opslaan</button>
+    <button id="cancelSavingBtn" class="secondary-btn">Annuleren</button>
+  </div>
+</div>
+
+<div id="tab-year" class="hidden">
 <div class="year-nav">
   <div class="nav-pill" id="yearNavPill">
     <div class="nav-pill-inner">
@@ -149,12 +179,7 @@
           </thead>
           <tbody id="yearTableBody"></tbody>
         </table>
-      <div class="info-text">
-        "Storting spaar" toont per maand hoeveel er naar of van je spaarrekening gaat. Positief = storting, negatief = opname.
-      </div>
-    </div>
-  </div>
-</div>
+      
 
   <!-- CATEGORIE-SHEET -->
   <div id="sheetOverlay" class="overlay">
