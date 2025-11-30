@@ -3,43 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <title>FinFlow • v39.11</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0; maximum-scale=1.0">
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-512.png" type="image/png" />
 
   <link rel="stylesheet" href="styles/app.css" />
 
+  <!-- Inline styles voor overlays, popup en hovergedrag -->
   <style>
     .saving-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.8);
       z-index: 900;
     }
+
     .saving-form {
-      position: relative;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 1000;
+      background: #0b0d1d;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      width: min(320px, 90vw);
+    }
+
+    td.saving-cell:hover {
+      background: rgba(114,255,159,0.18);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .edit-icon {
+      opacity: 1;
+      margin-left: 6px;
+      transition: opacity 0.15s ease;
+      vertical-align: middle;
     }
   </style>
-
-<style>
-td.saving-cell:hover {
-  background: rgba(114,255,159,0.18);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-.edit-icon {
-  opacity: 1;
-  margin-left: 6px;
-  transition: opacity 0.15s ease;
-  vertical-align: middle;
-}
-</style>
-
 </head>
 <body>
+
 <div id="savingOverlay" class="saving-overlay hidden"></div>
+
+<!-- Popup voor spaaractie per maand (wordt aangestuurd vanuit year.js) -->
+<div id="savingForm" class="saving-form hidden">
+  <div class="section-title">Spaaractie aanpassen</div>
+
+  <div class="startyear-row">
+    <span class="startyear-label">Bedrag</span>
+    <input
+      id="savingAmountInput"
+      type="text"
+      inputmode="decimal"
+      pattern="[0-9.,]*"
+      placeholder="0,00"
+      class="year-input"
+    />
+  </div>
+
+  <div class="year-saving-row">
+    <div class="year-saving-toggle-group">
+      <button id="savingToggleDeposit" class="year-saving-toggle">Storting</button>
+      <button id="savingToggleWithdrawal" class="year-saving-toggle">Opname</button>
+    </div>
+  </div>
+
+  <div class="saving-actions" style="display:flex; gap:8px; margin-top:12px;">
+    <button id="saveSavingBtn" class="save-settings-btn" style="flex:1;">Opslaan</button>
+    <button id="cancelSavingBtn" class="small-btn" style="flex:1;">Annuleren</button>
+  </div>
+</div>
+
   <div class="app">
     <h1>FinFlow</h1>
     <div class="subtitle">Inkomen, uitgaven, sparen — automatisch door alle maanden en jaren.</div>
@@ -58,15 +97,16 @@ td.saving-cell:hover {
 
     <!-- MAAND TAB -->
     <div id="tab-month" class="hidden">
-<div class="month-header">
-  <div class="nav-pill" id="monthNavPill">
-    <div class="nav-pill-inner">
-      <span class="nav-pill-arrow">&lt;</span>
-      <span class="nav-pill-label month-title" id="monthTitle"></span>
-      <span class="nav-pill-arrow">&gt;</span>
-    </div>
-  </div>
-</div>
+
+      <div class="month-header">
+        <div class="nav-pill" id="monthNavPill">
+          <div class="nav-pill-inner">
+            <span class="nav-pill-arrow">&lt;</span>
+            <span class="nav-pill-label month-title" id="monthTitle"></span>
+            <span class="nav-pill-arrow">&gt;</span>
+          </div>
+        </div>
+      </div>
 
       <div id="monthCategories"></div>
 
@@ -99,70 +139,47 @@ td.saving-cell:hover {
     </div>
 
     <!-- JAAR TAB -->
-<!-- Globaal spaaractieformulier -->
-<div id="savingForm" class="saving-form hidden">
-  <div class="saving-input-row">
-    <input id="savingAmountInput" class="inline-input" placeholder="Bedrag" type="number" inputmode="decimal" />
-    <div class="saving-toggle-group">
-      <button id="savingToggleDeposit" class="toggle-saving">Storting</button>
-      <button id="savingToggleWithdrawal" class="toggle-saving">Opname</button>
-    </div>
-  </div>
+    <div id="tab-year" class="hidden">
 
-  <div class="btn-row saving-actions">
-    <button id="saveSavingBtn" class="primary-btn">Opslaan</button>
-    <button id="cancelSavingBtn" class="secondary-btn">Annuleren</button>
-  </div>
-</div>
-
-<div id="tab-year" class="hidden">
-<div class="year-nav">
-  <div class="nav-pill" id="yearNavPill">
-    <div class="nav-pill-inner">
-      <span class="nav-pill-arrow">&lt;</span>
-      <span class="nav-pill-label year-title" id="yearTitle"></span>
-      <span class="nav-pill-arrow">&gt;</span>
-    </div>
-  </div>
-</div>
+      <div class="year-nav">
+        <div class="nav-pill" id="yearNavPill">
+          <div class="nav-pill-inner">
+            <span class="nav-pill-arrow" id="yearNavPrev">&lt;</span>
+            <span class="nav-pill-label year-title" id="yearTitle"></span>
+            <span class="nav-pill-arrow" id="yearNavNext">&gt;</span>
+          </div>
+        </div>
+      </div>
 
       <div class="settings-card">
+        <div class="startyear-row">
+          <span class="startyear-label">Beginsaldo bankrekening</span>
+          <input id="startingBankInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
+        </div>
 
-<div class="startyear-row">
-  <span class="startyear-label">Beginsaldo bankrekening</span>
-  <input id="startingBankInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
-</div>
-<div class="startyear-row">
-  <span class="startyear-label">Beginsaldo spaarrekening</span>
-  <input id="startingSavingsInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
-</div>
+        <div class="startyear-row">
+          <span class="startyear-label">Beginsaldo spaarrekening</span>
+          <input id="startingSavingsInput" type="text" inputmode="decimal" pattern="[0-9.,]*" placeholder="0" class="year-input" />
+        </div>
 
         <div class="year-saving-row">
           <input id="monthlySavingAmount"
             placeholder="Maandelijks sparen (leeg = 0)"
             class="year-saving-input">
           <div class="year-saving-toggle-group">
-            <button id="yearToggleDeposit"
-              class="year-saving-toggle">
-              Storting
-            </button>
-            <button id="yearToggleWithdrawal"
-              class="year-saving-toggle">
-              Opname
-            </button>
+            <button id="yearToggleDeposit" class="year-saving-toggle">Storting</button>
+            <button id="yearToggleWithdrawal" class="year-saving-toggle">Opname</button>
           </div>
         </div>
 
         <button id="saveSettingsBtn" class="save-settings-btn">Instellingen opslaan</button>
+
         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-          <button id="exportDataBtn" class="small-btn" style="flex:1; text-align:center;">
-            Data exporteren
-          </button>
-          <button id="importDataBtn" class="small-btn" style="flex:1; text-align:center;">
-            Data importeren
-          </button>
+          <button id="exportDataBtn" class="small-btn" style="flex:1; text-align:center;">Data exporteren</button>
+          <button id="importDataBtn" class="small-btn" style="flex:1; text-align:center;">Data importeren</button>
           <input type="file" id="importFileInput" accept="application/json" style="display:none;">
         </div>
+
       </div>
 
       <div class="card">
@@ -179,45 +196,45 @@ td.saving-cell:hover {
           </thead>
           <tbody id="yearTableBody"></tbody>
         </table>
-      
+      </div>
 
-  <!-- CATEGORIE-SHEET -->
-  <div id="sheetOverlay" class="overlay">
+    </div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- 🟦 CATEGORIE-SHEET (CORRECT MET HIDDEN)   -->
+  <!-- ========================================= -->
+  <div id="sheetOverlay" class="overlay hidden">
     <div id="sheetForm" class="sheet">
-      <h2 id="sheetTitle">Categorie</h2>
 
-      <input id="nameInput" placeholder="Naam" />
+      <div id="sheetTitle">Categorie bewerken</div>
 
-      <div class="toggle-row toggle-row-top">
+      <input id="nameInput" placeholder="Naam van categorie" />
+
+      <div class="toggle-row">
         <button id="catToggleExpense">Uitgave</button>
         <button id="catToggleIncome">Inkomen</button>
       </div>
 
-      <input type="hidden" id="typeInput" value="expense" />
-
       <div class="startyear-row">
         <span class="startyear-label">Startjaar</span>
-        <input id="catStartYear" type="text" inputmode="decimal" pattern="[0-9.,]*" /> <span id="catStartYearHint" class="cat-hint"></span>
+        <input id="catStartYear" type="number" />
+        <div id="catStartYearHint" class="cat-hint"></div>
       </div>
-      
 
-      <div class="cat-year-block">
-        <div class="cat-year-header">
-          <span>Jaar</span>
-          <span>Standaard maandbedrag</span>
-        </div>
-        <div id="catYearAmountsRows"></div>
-        <button id="addCatYearBtn" class="secondary-btn full-width">Nieuw jaar toevoegen</button>
-        <div id="catYearHelp" class="cat-hint"></div>
-      </div>
+      <div id="catYearHelp" class="cat-hint"></div>
+
+      <div id="catYearAmountsRows"></div>
+
+      <button id="addCatYearBtn" class="add-btn">+ Nieuw jaar toevoegen</button>
 
       <button id="sheetSave" class="sheet-btn">Opslaan</button>
-      <button id="sheetClose" class="close-btn">Sluiten</button>
+      <button id="sheetClose" class="close-btn">Annuleren</button>
+
+      <input type="hidden" id="typeInput" value="expense" />
     </div>
   </div>
-
-
-  
+  <!-- ========================================= -->
 
   <script type="module" src="scripts/main.js"></script>
 </body>

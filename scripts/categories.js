@@ -16,67 +16,71 @@ export function renderCategories() {
 
   list.innerHTML = "";
 
-  if (cats.length === 0) {
-    const empty = document.createElement("div");
-    empty.style.fontSize = "13px";
-    empty.style.color = "#a4a7c4";
-    empty.textContent = "Nog geen categorieën. Voeg er één toe.";
-    list.appendChild(empty);
+  if (!Array.isArray(cats) || cats.length === 0) {
+    const p = document.createElement("p");
+    p.textContent =
+      "Nog geen categorieën. Voeg als eerste je vaste inkomens- en uitgavencategorieën toe.";
+    p.style.opacity = "0.7";
+    list.appendChild(p);
     return;
   }
 
   cats.forEach((c, idx) => {
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "cat-card";
 
     const header = document.createElement("div");
-    header.className = "card-header";
+    header.className = "cat-card-header";
 
     const left = document.createElement("div");
-    left.className = "card-left";
+    left.className = "left";
 
-    const tag = document.createElement("div");
-    tag.className = "label " + (c.type === "income" ? "income" : "expense");
-    tag.textContent = c.type === "income" ? "INKOMEN" : "UITGAVE";
-    left.appendChild(tag);
+    const nameEl = document.createElement("div");
+    nameEl.className = "cat-name";
+    nameEl.textContent = c.name || "(naamloos)";
+    left.appendChild(nameEl);
 
-    const title = document.createElement("div");
-    title.className = "card-title";
-    title.textContent = c.name;
-    left.appendChild(title);
+    const startEl = document.createElement("div");
+    startEl.className = "cat-start";
+    if (c.startYear) {
+      startEl.textContent = "Vanaf " + c.startYear;
+    } else {
+      startEl.textContent = "Vanaf eerste jaar";
+    }
+    left.appendChild(startEl);
 
     header.appendChild(left);
 
     const right = document.createElement("div");
-    right.style.textAlign = "right";
+    right.className = "right";
 
     const amt = document.createElement("div");
-    amt.className = "card-amount";
-    let rawVal = "";
+    amt.className = "cat-amount";
+    let currentYear = new Date().getFullYear();
+    let rawVal = null;
     if (c.amountsByYear && typeof c.amountsByYear === "object") {
       const years = Object.keys(c.amountsByYear)
-        .map((k) => parseInt(k, 10))
-        .filter((y) => !Number.isNaN(y))
+        .map((y) => parseInt(y, 10))
+        .filter((n) => !Number.isNaN(n))
         .sort((a, b) => a - b);
-      if (years.length > 0) {
-        const currentY = new Date().getFullYear();
-        let chosen = null;
-        for (const y of years) {
-          if (y <= currentY) {
-            chosen = y;
-          }
-        }
-        if (chosen === null) {
-          chosen = years[0];
-        }
+      let chosen = null;
+      for (const y of years) {
+        if (y <= currentYear) chosen = y;
+      }
+      if (chosen === null && years.length > 0) {
+        chosen = years[0];
+      }
+      if (chosen !== null) {
         rawVal = c.amountsByYear[String(chosen)];
       }
-    } else {
-      rawVal = c.amount ?? "";
     }
-    let num = parseFloat((rawVal ?? "").toString().replace(",", "."));
-    if (isNaN(num)) num = 0;
-    amt.textContent = "€ " + num.toFixed(2).replace(".", ",");
+    if (rawVal == null) {
+      amt.textContent = "€ 0,00";
+    } else {
+      let num = parseFloat(rawVal.toString().replace(",", "."));
+      if (isNaN(num)) num = 0;
+      amt.textContent = "€ " + num.toFixed(2).replace(".", ",");
+    }
     right.appendChild(amt);
 
     const t = document.createElement("div");
@@ -93,14 +97,22 @@ export function renderCategories() {
     const row = document.createElement("div");
     row.className = "btn-row";
 
-    const editBtn = (()=>{let b=document.createElement("button"); b.type="button"; return b;})();
+    const editBtn = (() => {
+      let b = document.createElement("button");
+      b.type = "button";
+      return b;
+    })();
     editBtn.type = "button";
     editBtn.className = "small-btn";
     editBtn.textContent = "Bewerken";
     editBtn.onclick = () => openSheet(idx);
     row.appendChild(editBtn);
 
-    const delBtn = (()=>{let b=document.createElement("button"); b.type="button"; return b;})();
+    const delBtn = (() => {
+      let b = document.createElement("button");
+      b.type = "button";
+      return b;
+    })();
     delBtn.type = "button";
     delBtn.className = "small-btn danger";
     delBtn.textContent = "Verwijderen";
@@ -231,118 +243,146 @@ function openSheet(index) {
           amountsByYear: { [String(currentY)]: "0.00" },
         };
 
-  document.getElementById("sheetTitle").textContent =
-    editIndex === null ? "Nieuwe categorie" : "Categorie bewerken";
-  document.getElementById("nameInput").value = base.name || "";
-  document.getElementById("typeInput").value = base.type || "expense";
+  const titleEl = document.getElementById("sheetTitle");
+  if (titleEl) {
+    titleEl.textContent =
+      editIndex === null ? "Nieuwe categorie" : "Categorie bewerken";
+  }
+
+  const nameInput = document.getElementById("nameInput");
+  if (!nameInput) {
+    console.error("nameInput niet gevonden in DOM");
+    return;
+  }
+  nameInput.value = base.name || "";
+
+  const typeInput = document.getElementById("typeInput");
+  if (typeInput) {
+    typeInput.value = base.type || "expense";
+  }
 
   const yInput = document.getElementById("catStartYear");
-  const startY =
+  const currentYVal =
     typeof base.startYear === "number" && !isNaN(base.startYear)
       ? base.startYear
       : currentY;
-  yInput.value = startY;
+  if (yInput) {
+    yInput.value = currentYVal;
+  }
 
   // --- Automatisch jaarregel syncen + hint updaten (alleen bij nieuwe categorie) ---
-  if (editIndex === null) {
-    yInput.addEventListener("blur", () => {
-      const newStart = parseInt(yInput.value, 10);
-      if (isNaN(newStart)) return;
+  if (editIndex === null && yInput) {
+    yInput.addEventListener(
+      "blur",
+      () => {
+        const newStart = parseInt(yInput.value, 10);
+        if (isNaN(newStart)) return;
 
-      const rowsContainer = document.getElementById("catYearAmountsRows");
-      if (!rowsContainer) return;
+        const rowsContainer = document.getElementById("catYearAmountsRows");
+        if (!rowsContainer) return;
 
-      // Hinttekst updaten op basis van nieuwe startjaar
-      const startHintEl = document.getElementById("catStartYearHint");
-      if (startHintEl) {
-        startHintEl.textContent =
-          "Deze categorie telt mee vanaf " +
-          newStart +
-          ". In eerdere jaren wordt hij niet automatisch meegenomen.";
-      }
+        const startHintEl = document.getElementById("catStartYearHint");
+        if (startHintEl) {
+          startHintEl.textContent =
+            "Deze categorie telt mee vanaf " +
+            newStart +
+            ". In eerdere jaren wordt hij niet automatisch meegenomen.";
+        }
 
-      const rows = rowsContainer.getElementsByClassName("cat-year-row");
+        const rows = rowsContainer.getElementsByClassName("cat-year-row");
 
-      // Als er nog geen jaarregels zijn → maak er één
-      if (rows.length === 0) {
-        createYearRow(rowsContainer, newStart, "");
-        return;
-      }
-
-      // Anders: update de eerste jaarregel
-      const firstRow = rows[0];
-      if (firstRow && firstRow._yearInput) {
-        firstRow._yearInput.value = newStart;
-      }
-    });
+        if (rows.length === 0) {
+          createYearRow(rowsContainer, newStart, "0.00");
+        }
+      },
+      { once: true }
+    );
   }
 
-  const startHint = document.getElementById("catStartYearHint");
-  if (startHint) {
-    startHint.textContent =
-      "Deze categorie telt mee vanaf " +
-      startY +
-      ". In eerdere jaren wordt hij niet automatisch meegenomen.";
-  }
-
+  // Jaarregels initialiseren op basis van base.amountsByYear
   const rowsContainer = document.getElementById("catYearAmountsRows");
   if (rowsContainer) {
     rowsContainer.innerHTML = "";
-    const years =
-      base.amountsByYear && typeof base.amountsByYear === "object"
-        ? Object.keys(base.amountsByYear)
-            .map((k) => parseInt(k, 10))
-            .filter((y) => !Number.isNaN(y))
-            .sort((a, b) => a - b)
-        : [];
+    // ✅ Fix: alleen de "object"-tak pakken als er ook echt entries zijn
+    if (
+      base.amountsByYear &&
+      typeof base.amountsByYear === "object" &&
+      Object.keys(base.amountsByYear).length > 0
+    ) {
+      const years = Object.keys(base.amountsByYear)
+        .map((k) => parseInt(k, 10))
+        .filter((n) => !isNaN(n))
+        .sort((a, b) => a - b);
 
-    if (years.length === 0) {
-      createYearRow(rowsContainer, startY, "");
-    } else {
       years.forEach((y) => {
-        const key = String(y);
-        createYearRow(
-          rowsContainer,
-          y,
-          Object.prototype.hasOwnProperty.call(base.amountsByYear, key)
-            ? base.amountsByYear[key]
-            : ""
-        );
+        createYearRow(rowsContainer, y, base.amountsByYear[String(y)]);
       });
+    } else {
+      // Voor nieuwe categorieën of lege amountsByYear altijd minimaal één rij
+      createYearRow(rowsContainer, currentYVal, "0.00");
     }
   }
 
-  const yearHelp = document.getElementById("catYearHelp");
-  if (yearHelp) {
-    yearHelp.textContent =
-      "Stel per jaar het standaard maandbedrag in. Je kunt bedragen later per maand aanpassen in de Maand-tab.";
+  const helpEl = document.getElementById("catYearHelp");
+  if (helpEl) {
+    helpEl.textContent =
+      "Je kunt per jaar een ander standaard maandbedrag invullen. Latere jaren zonder waarde blijven gelijk aan het laatste ingevulde jaar.";
   }
 
   updateTypeButtons(base.type);
 
-  overlay.style.display = "block";
+  if (!overlay || !sheet) {
+    alert(
+      "Categorie-sheet ontbreekt in index.html (sheetOverlay / sheetForm). De rest van de app blijft werken, maar deze sheet niet."
+    );
+    console.error(
+      "[FinFlow] openSheet() aangeroepen, maar sheetOverlay/sheetForm ontbreken in de DOM."
+    );
+    return;
+  }
+
+  overlay.style.display = "flex";
   setTimeout(() => sheet.classList.add("show"), 10);
 }
 
 function closeSheet() {
+  if (!overlay || !sheet) return;
   sheet.classList.remove("show");
   setTimeout(() => (overlay.style.display = "none"), 250);
   editIndex = null;
 }
 
 function setupSheetEvents() {
+  // --- Nieuwe categorie toevoegen ---
   const newCatBtn = document.getElementById("newCat");
-  if (newCatBtn) newCatBtn.type = "button";
-  newCatBtn.onclick = () => openSheet(null);
+  if (newCatBtn) {
+    newCatBtn.type = "button";
+    newCatBtn.onclick = () => {
+      console.log(
+        "[FinFlow] Klik op 'Nieuwe categorie toevoegen' → openSheet(null)"
+      );
+      openSheet(null);
+    };
+  } else {
+    console.warn("[FinFlow] Knop met id 'newCat' niet gevonden in DOM");
+  }
+
+  // --- Sheet sluiten ---
   const sheetCloseBtn = document.getElementById("sheetClose");
-  if (sheetCloseBtn) sheetCloseBtn.type = "button";
-  sheetCloseBtn.onclick = closeSheet;
+  if (sheetCloseBtn) {
+    sheetCloseBtn.type = "button";
+    sheetCloseBtn.onclick = closeSheet;
+  }
 
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) closeSheet();
-  });
-  sheet.addEventListener("click", (e) => e.stopPropagation());
+  // Klikken buiten het sheet → sluiten
+  if (overlay && sheet) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeSheet();
+    });
+    sheet.addEventListener("click", (e) => e.stopPropagation());
+  }
 
+  // --- Jaar toevoegen-knop ---
   const addYearBtn = document.getElementById("addCatYearBtn");
   if (addYearBtn) {
     addYearBtn.type = "button";
@@ -351,7 +391,6 @@ function setupSheetEvents() {
       const rowsContainer = document.getElementById("catYearAmountsRows");
       if (!rowsContainer) return;
 
-      // Verzamel alle bestaande jaren uit de UI
       const rows = Array.from(
         rowsContainer.getElementsByClassName("cat-year-row")
       );
@@ -360,7 +399,6 @@ function setupSheetEvents() {
         .filter((y) => !Number.isNaN(y))
         .sort((a, b) => a - b);
 
-      // Als er geen jaren zijn → gebruik startYear
       let newYear;
       if (years.length === 0) {
         const startY = parseInt(
@@ -369,7 +407,6 @@ function setupSheetEvents() {
         );
         newYear = startY;
       } else {
-        // Anders: pak hoogste jaar + 1
         newYear = years[years.length - 1] + 1;
       }
 
@@ -377,121 +414,135 @@ function setupSheetEvents() {
     };
   }
 
-  document.getElementById("catToggleExpense").onclick = () => {
-    document.getElementById("typeInput").value = "expense";
-    updateTypeButtons("expense");
-  };
-  document.getElementById("catToggleIncome").onclick = () => {
-    document.getElementById("typeInput").value = "income";
-    updateTypeButtons("income");
-  };
-
-  const sheetSaveBtn = document.getElementById("sheetSave");
-  if (sheetSaveBtn) sheetSaveBtn.type = "button";
-  sheetSaveBtn.onclick = () => {
-    const name = document.getElementById("nameInput").value.trim();
-    const type = document.getElementById("typeInput").value;
-    const yInput = document.getElementById("catStartYear");
-    const currentY = new Date().getFullYear();
-    let startY =
-      yInput && yInput.value.trim() !== ""
-        ? parseInt(yInput.value, 10)
-        : currentY;
-    if (isNaN(startY)) startY = currentY;
-
-    if (!name) {
-      alert("Naam verplicht");
-      return;
-    }
-
-    // Voorkom dubbele categorienamen (niet hoofdlettergevoelig).
-    const cats = loadCats();
-    const lowerName = name.toLowerCase();
-    const hasDuplicate = cats.some((c, idx) => {
-      const existing = (c.name || "").trim().toLowerCase();
-      return existing === lowerName && idx !== editIndex;
-    });
-    if (hasDuplicate) {
-      alert(
-        "Er bestaat al een categorie met deze naam. Kies een andere naam."
-      );
-      return;
-    }
-
-    // Lees jaarbedragen uit de UI
-    const rowsContainer = document.getElementById("catYearAmountsRows");
-    const rows = rowsContainer
-      ? Array.from(rowsContainer.getElementsByClassName("cat-year-row"))
-      : [];
-    const amountsByYear = {};
-    for (const row of rows) {
-      const yField = row._yearInput;
-      const aField = row._amountInput;
-      if (!yField || !aField) continue;
-
-      const yStr = (yField.value || "").trim();
-      if (!yStr) continue;
-      const yNum = parseInt(yStr, 10);
-      if (Number.isNaN(yNum) || yNum < 1900 || yNum > 2999) continue;
-
-      let raw = (aField.value || "").trim();
-      if (!raw) continue;
-      let num = Number(raw.replace(",", "."));
-      if (Number.isNaN(num)) num = 0;
-      const normalized = num.toFixed(2);
-
-      amountsByYear[String(yNum)] = normalized;
-    }
-
-    if (Object.keys(amountsByYear).length === 0) {
-      // Als er geen jaarbedragen zijn ingevuld, gebruik startjaar met 0 als basis.
-      amountsByYear[String(startY)] = "0.00";
-    }
-
-    const oldCatName =
-      editIndex !== null && cats[editIndex] ? cats[editIndex].name : null;
-
-    const newCat = {
-      name,
-      type,
-      startYear: startY,
-      amountsByYear,
+  // --- Type toggles ---
+  const expenseToggle = document.getElementById("catToggleExpense");
+  if (expenseToggle) {
+    expenseToggle.onclick = () => {
+      const typeInput = document.getElementById("typeInput");
+      if (typeInput) typeInput.value = "expense";
+      updateTypeButtons("expense");
     };
+  }
 
-    if (editIndex !== null && cats[editIndex]) {
-      cats[editIndex] = newCat;
-    } else {
-      cats.push(newCat);
-    }
+  const incomeToggle = document.getElementById("catToggleIncome");
+  if (incomeToggle) {
+    incomeToggle.onclick = () => {
+      const typeInput = document.getElementById("typeInput");
+      if (typeInput) typeInput.value = "income";
+      updateTypeButtons("income");
+    };
+  }
 
-    saveCats(cats);
-    // Zorg dat maanddata meeverhuist als de categorienaam wijzigt
-    if (editIndex !== null && oldCatName && oldCatName !== name) {
-      const md = loadMonthData();
-      let changed = false;
-      for (const key in md) {
-        const entry = md[key];
-        if (
-          entry &&
-          entry.cats &&
-          Object.prototype.hasOwnProperty.call(entry.cats, oldCatName)
-        ) {
-          const val = entry.cats[oldCatName];
-          if (!Object.prototype.hasOwnProperty.call(entry.cats, name)) {
-            entry.cats[name] = val;
-          }
-          delete entry.cats[oldCatName];
-          changed = true;
-        }
+  // --- Opslaan-knop ---
+  const sheetSaveBtn = document.getElementById("sheetSave");
+  if (sheetSaveBtn) {
+    sheetSaveBtn.type = "button";
+    sheetSaveBtn.onclick = () => {
+      const nameEl = document.getElementById("nameInput");
+      const typeEl = document.getElementById("typeInput");
+      const yInput = document.getElementById("catStartYear");
+
+      const name = nameEl ? nameEl.value.trim() : "";
+      const type = typeEl ? typeEl.value : "expense";
+
+      const currentY = new Date().getFullYear();
+      let startY =
+        yInput && yInput.value.trim() !== ""
+          ? parseInt(yInput.value, 10)
+          : currentY;
+      if (isNaN(startY)) startY = currentY;
+
+      if (!name) {
+        alert("Naam verplicht");
+        return;
       }
-      if (changed) saveMonthData(md);
-    }
 
-    closeSheet();
-    renderCategories();
-    resetCaches();
-    if (typeof onDataChanged === "function") onDataChanged();
-  };
+      const cats = loadCats();
+      const lowerName = name.toLowerCase();
+      const hasDuplicate = cats.some((c, idx) => {
+        const existing = (c.name || "").trim().toLowerCase();
+        return existing === lowerName && idx !== editIndex;
+      });
+      if (hasDuplicate) {
+        alert(
+          "Er bestaat al een categorie met deze naam. Kies een andere naam."
+        );
+        return;
+      }
+
+      const rowsContainer = document.getElementById("catYearAmountsRows");
+      const rows = rowsContainer
+        ? Array.from(rowsContainer.getElementsByClassName("cat-year-row"))
+        : [];
+      const amountsByYear = {};
+      for (const row of rows) {
+        const yField = row._yearInput;
+        const aField = row._amountInput;
+        if (!yField || !aField) continue;
+
+        const yStr = (yField.value || "").trim();
+        if (!yStr) continue;
+        const yNum = parseInt(yStr, 10);
+        if (Number.isNaN(yNum) || yNum < 1900 || yNum > 2999) continue;
+
+        let raw = (aField.value || "").trim();
+        if (!raw) continue;
+        let num = Number(raw.replace(",", "."));
+        if (Number.isNaN(num)) num = 0;
+        const normalized = num.toFixed(2);
+
+        amountsByYear[String(yNum)] = normalized;
+      }
+
+      if (Object.keys(amountsByYear).length === 0) {
+        amountsByYear[String(startY)] = "0.00";
+      }
+
+      const oldCatName =
+        editIndex !== null && cats[editIndex] ? cats[editIndex].name : null;
+
+      const newCat = {
+        name,
+        type,
+        startYear: startY,
+        amountsByYear,
+      };
+
+      if (editIndex !== null && cats[editIndex]) {
+        cats[editIndex] = newCat;
+      } else {
+        cats.push(newCat);
+      }
+
+      saveCats(cats);
+
+      if (editIndex !== null && oldCatName && oldCatName !== name) {
+        const md = loadMonthData();
+        let changed = false;
+        for (const key in md) {
+          const entry = md[key];
+          if (
+            entry &&
+            entry.cats &&
+            Object.prototype.hasOwnProperty.call(entry.cats, oldCatName)
+          ) {
+            const val = entry.cats[oldCatName];
+            if (!Object.prototype.hasOwnProperty.call(entry.cats, name)) {
+              entry.cats[name] = val;
+            }
+            delete entry.cats[oldCatName];
+            changed = true;
+          }
+        }
+        if (changed) saveMonthData(md);
+      }
+
+      closeSheet();
+      renderCategories();
+      resetCaches();
+      if (typeof onDataChanged === "function") onDataChanged();
+    };
+  }
 }
 
 export function initCategoriesModule() {

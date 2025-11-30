@@ -141,6 +141,7 @@ export function simulateYear(year) {
   const { yearStarting, yearBankStarting, yearMonthlySaving } = settings;
 
   const prev = simulateYear(year - 1);
+  const monthData = loadMonthData();   // <-- NIEUW
 
   let savingStart;
   if (Object.prototype.hasOwnProperty.call(yearStarting, year)) {
@@ -175,15 +176,24 @@ export function simulateYear(year) {
     let availAdj = t.available;
 
     // Alleen maandelijkse spaaractie toepassen in maanden zonder handmatige spaaractie
-    if (yms && !t.hasManualSavings) {
-      if (yms.type === "deposit") {
-        depExtra = yms.amount;
-        availAdj -= yms.amount;
-      } else if (yms.type === "withdrawal") {
-        wdrExtra = yms.amount;
-        availAdj += yms.amount;
-      }
-    }
+// Check expliciete "0" spaaractie
+const key = `${year}-${m < 10 ? "0" + m : m}`;
+const entry = monthData[key] || {};
+const explicitNoSaving = entry._explicitNoSaving === true;
+
+// Alleen jaar-maandbedrag toepassen als:
+// - er een jaarsparing is
+// - er geen handmatige spaaractie is
+// - de gebruiker NIET expliciet 0 heeft gezet
+if (yms && !t.hasManualSavings && !explicitNoSaving) {
+  if (yms.type === "deposit") {
+    depExtra = yms.amount;
+    availAdj -= yms.amount;
+  } else if (yms.type === "withdrawal") {
+    wdrExtra = yms.amount;
+    availAdj += yms.amount;
+  }
+}
 
     // Bepaal maandelijkse storting/opname spaarrekening (handmatig leading)
     let monthSaving = 0;
