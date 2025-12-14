@@ -1,38 +1,51 @@
 // scripts/main.js
-import { initTabs } from "./ui.js";
-import { setCategoriesChangeHandler, renderCategories, initCategoriesModule } from "./categories.js";
-import { initMonthModule, renderMonth } from "./month.js";
-import { initYearModule, renderYear } from "./year.js";
-import { initBackupModule } from "./backup.js";
-import { resetCaches } from "./state.js";
 
+import { loadSettings, saveSettings, loadMonthData, saveMonthData } from "./core/storage.js";
+
+// CATEGORIES
+import { setCategoriesChangeHandler, renderCategories, initCategoriesModule } from "./categories/categories.js";
+
+// MONTH
+import { initMonthModule, renderMonth } from "./month/month.js";
+
+// YEAR
+import { initYearModule } from "./year/year.js"; 
+import { renderYear } from "./year/year-render.js";
+import { renderCategoriesList } from "./categories/categories-sheet.js";
+
+// BACKUP
+import { initBackupModule } from "./backup.js";
+
+// CORE
+import { resetCaches } from "./core/state.js";
+
+// WIZARD
+// Alleen setupWelcomeStartHandler is nog nodig (voor de knop-functionaliteit in HTML),
+// de problematische maybeRunInitialWizard is verwijderd.
+import { setupWelcomeStartHandler } from "./wizard/flow.js"; 
+
+
+// CENTRAL DATA CHANGE HANDLER
 function handleDataChanged() {
   resetCaches();
-  const activeEl = document.querySelector(".tab.active");
-  const activeTab = activeEl ? activeEl.getAttribute("data-tab") : null;
-  if (activeTab === "month") renderMonth();
-  if (activeTab === "year") renderYear();
+  renderYear();
+  renderCategoriesList();
 }
 
+// MAIN STARTUP SEQUENCE
 document.addEventListener("DOMContentLoaded", () => {
-  initTabs((tab) => {
-    if (tab === "categories") renderCategories();
-    if (tab === "month") renderMonth();
-    if (tab === "year") renderYear();
-  });
 
-  // Initialiseer categorie-sheet events (Nieuwe categorie, sluiten, opslaan, etc.)
-  initCategoriesModule();
+  // 1. Modules initialiseren. initYearModule bevat de GEFIXTE wizard-check.
+  initYearModule(handleDataChanged);
+  initMonthModule(handleDataChanged);
+  initBackupModule(handleDataChanged);
+  initCategoriesModule(); // Initialiseer de categorie module
 
   setCategoriesChangeHandler(handleDataChanged);
-  initMonthModule(handleDataChanged);
-  initYearModule(handleDataChanged);
-  initBackupModule(handleDataChanged);
 
-  // Start in de huidige actieve tab (meestal categorieën of maand)
-  const activeEl = document.querySelector(".tab.active");
-  const activeTab = activeEl ? activeEl.getAttribute("data-tab") : "categories";
-  if (activeTab === "categories") renderCategories();
-  if (activeTab === "month") renderMonth();
-  if (activeTab === "year") renderYear();
+  // Koppel de handler, zodat deze overal beschikbaar is
+  window.handleDataChanged = handleDataChanged;
+  
+  // Zorg ervoor dat de 'Aan de slag' knop op het welkomstscherm altijd werkt.
+  setupWelcomeStartHandler();
 });

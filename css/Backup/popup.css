@@ -1,0 +1,39 @@
+/* Popup styles – reserved for future extraction from core.css */
+
+/* 1. Knoppen in de Body (settings-action-group) - 100% breedte, Gecentreerde tekst, Marge */
+.ff-settings-popup--vertical .settings-action-group button {
+    display: flex; 
+    width: 100%; 
+    justify-content: center; /* Horizontaal centrum */
+    align-items: center;     /* Verticaal centrum */
+    margin-bottom: 12px;     /* Ruimte tussen de knoppen */
+}
+
+/* 2. FIX: Zorgt dat de footer container 100% breed is. */
+.ff-settings-popup--vertical .popup-footer,
+.ff-settings-popup--vertical .ff-popup__footer {
+    width: 100%;
+}
+
+
+/* 3. De Sluiten-knop (in de popup-footer) - NU MET FLEX-GROW */
+.ff-settings-popup--vertical .popup-footer button,
+.ff-settings-popup--vertical .ff-popup__footer button {
+    display: flex; 
+    width: 100%;             
+    /* CRUCIALE FIX: Dwingt de knop om de volledige beschikbare ruimte op te vullen */
+    flex-grow: 1;            
+    justify-content: center; 
+    align-items: center;     
+    margin-bottom: 0;        /* Geen marge na de laatste knop */
+}
+
+/* --- Spatiëring regels (op basis van uw laatste input) --- */
+
+.ff-popup__header {
+    margin-bottom: 14px; 
+}
+
+.ff-popup__body .ff-popup__text {
+    margin-bottom: 16px;
+}

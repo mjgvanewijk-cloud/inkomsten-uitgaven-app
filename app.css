@@ -1,0 +1,7 @@
+/* Wrapper stylesheet – componeert alle modulaire CSS-bestanden. */
+@import url("css/core.css");
+@import url("css/layout.css");
+@import url("css/table.css");
+@import url("css/popup.css");
+@import url("css/nav.css");
+@import url("css/components.css");

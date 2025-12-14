@@ -1,0 +1,2102 @@
+/* Core styles extracted from original app.css (deduplicated) */
+html {
+  overflow-x:hidden;
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body {
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#050716;
+  color:#f5f7ff;
+  padding:16px;
+  overflow-x:hidden;
+}
+.app {
+  max-width:900px;
+  margin:0 auto;
+}
+h1 {
+  font-size:20px;
+  margin-bottom:12px;
+}
+.subtitle {
+  font-size:13px;
+  color:#a4a7c4;
+  margin-bottom:16px;
+}
+.tabs {
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+.tab {
+  flex:1;
+  text-align:center;
+  padding:8px 0;
+  border-radius:999px;
+  font-size:13px;
+  cursor:pointer;
+  background:#111325;
+  color:#a4a7c4;
+}
+.tab.active {
+  background:#2f46ff;
+  color:#fff;
+}
+.hidden {
+  display: none !important;
+}
+
+.card {
+  background:#0b0d1d;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+.card-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.card-left {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.label {
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+  display:inline-block;
+}
+.label.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.label.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+.card-title {
+  font-size:14px;
+}
+.card-amount {
+  font-size:16px;
+  font-weight:600;
+}
+.card-type {
+  font-size:11px;
+  color:#7e81a3;
+}
+.pill {
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
+}
+.pill.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.pill.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+.btn-row {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:8px;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.small-btn {
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:#111325;
+  color:#a4a7c4;
+}
+.small-btn.danger {
+  color:#ff8080;
+}
+.add-btn {
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px dashed #2f46ff;
+  color:#9ba4ff;
+  background:transparent;
+  margin-bottom:12px;
+  font-size:13px;
+}
+.section-title {
+  font-size:14px;
+  margin:10px 0 6px;
+  color:#e0e2ff;
+}
+.summary-row {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-top:2px;
+}
+.summary-label {
+  color:#a4a7c4;
+}
+.summary-value.good {
+  color:#72ff9f;
+}
+.summary-value.bad {
+  color:#ff8080;
+}
+.summary-value.neutral {
+  color:#e0e2ff;
+}
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:20;
+}
+.sheet {
+  width:100%;
+  max-width:500px;
+  background:#050716;
+  border-radius:16px 16px 0 0;
+  padding:16px;
+  transform:translateY(100%);
+  transition:transform 0.25s ease-out;
+
+  max-height:90vh;
+  overflow-y:auto;
+}
+.sheet.show {
+  transform:translateY(0);
+}
+#sheetTitle {
+  font-size:16px;
+  margin-bottom:10px;
+}
+.close-btn,
+.sheet-btn {
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+.sheet-btn {
+  background:#2f46ff;
+  color:#fff;
+}
+.close-btn {
+  background:#111325;
+  color:#a4a7c4;
+}
+#nameInput,
+#amountInput {
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  margin-bottom:8px;
+  font-size:14px;
+}
+#amountInput {
+  flex:1;
+}
+.toggle-row {
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.toggle-row button {
+  flex:1;
+  padding:6px 8px;
+  border-radius:999px;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* Categorie-toggle specifiek: rood/groen */
+#catToggleExpense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+#catToggleIncome {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+
+/* Maand-spaaractie toggle, stijl gelijkend aan jaar-tab */
+.toggle-saving {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+
+/* Jaar-spaaractie toggle */
+.year-saving-toggle {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+
+.month-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.month-title {
+  font-size:16px;
+}
+.nav-btn {
+  background:#111325;
+  border:none;
+  border-radius:999px;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:#a4a7c4;
+}
+.inline-input {
+  width:100%;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  font-size:13px;
+}
+.month-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin-top:8px;
+}
+.month-table th,
+.month-table td {
+  padding:4px 2px;
+  text-align:right;
+}
+.month-table th:first-child,
+.month-table td:first-child {
+  text-align:left;
+}
+.month-table th {
+  color:#a4a7c4;
+  border-bottom:1px solid #111325;
+}
+.tag-savings {
+  font-size:11px;
+  color:#72ff9f;
+}
+.spaar-row {
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid #111325;
+}
+.badge-lock {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  color:#ffca80;
+  background:#3b2a1b;
+  padding:2px 6px;
+  border-radius:999px;
+  margin-top:4px;
+}
+.year-nav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.year-title {
+  font-size:16px;
+}
+.icon-btn {
+  background:#111325;
+  border:none;
+  border-radius:999px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#a4a7c4;
+}
+.year-grid {
+  width:100%;
+  max-width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin-top:8px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.year-grid th,
+.year-grid td {
+  padding:4px 2px;
+  text-align:right;
+}
+.year-grid th:first-child,
+.year-grid td:first-child {
+  text-align:left;
+}
+.year-grid th {
+  color:#a4a7c4;
+  border-bottom:1px solid #111325;
+}
+.settings-card {
+  background:#050716;
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+}
+.info-text {
+  font-size:11px;
+  color:#7e81a3;
+  margin-top:4px;
+}
+
+/* Saving form visuals */
+.saving-form {
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.saving-actions {
+  justify-content:space-between;
+}
+.primary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+.secondary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#111325;
+  color:#a4a7c4;
+  font-size:13px;
+}
+
+/* Verwijder-knoppen bij spaaracties iets compacter */
+.saving-delete-btn {
+  font-size:11px;
+  padding:3px 6px;
+}
+
+@media (min-width:700px) {
+  .app {
+    margin-top:16px;
+  }
+}
+
+
+/* Startjaar rij in sheet */
+.startyear-row {
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.startyear-label {
+  font-size:14px;
+  color:#a4a7c4;
+}
+#catStartYear {
+  width:140px;
+  height:36px;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+}
+
+/* Maand-spaaractie: input met knoppen erachter */
+.saving-input-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+.saving-form {
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.saving-actions {
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+/* Jaartab: spaaractie in één rij */
+.year-saving-row {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  align-items:center;
+}
+.year-saving-input {
+  flex:1;
+  height:36px;
+  padding:8px 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:white;
+  box-sizing:border-box;
+}
+.year-saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+
+/* Jaartab: instellingen opslaan knop volledig blauw */
+.save-settings-btn {
+  width:100%;
+  margin-top:14px;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+
+
+/* Euro label in category sheet */
+.euro-label {
+  font-size:13px;
+  color:#a4a7c4;
+  display:flex;
+  align-items:center;
+}
+
+/* Extra ruimte onder + Spaaractie knop naar lijst */
+#savingsList {
+  margin-top:10px;
+}
+
+input,button{font-size:16px !important;}
+
+.year-saving-row { display:flex; gap:6px; flex-wrap:nowrap; align-items:center; }
+.year-saving-toggle { white-space:nowrap; padding:0 8px; font-size:14px !important; }
+.year-saving-input { font-size:14px !important; }
+#startingBankInput, #startingSavingsInput, #monthlySavingAmount { font-size:14px !important; }
+
+/* Added dotted borders for year table */
+.year-grid th, .year-grid td {
+  border: 1px dotted #2f46ff;
+}
+.year-grid {
+  border-collapse: collapse;
+}
+
+
+.year-grid th {
+  background: rgba(47,70,255,0.25);
+}
+.year-grid th:first-child {
+  border-top-left-radius: 12px;
+}
+.year-grid th:last-child {
+  border-top-right-radius: 12px;
+}
+.year-grid td, .year-grid th {
+  border: 1px dotted #2f46ff;
+}
+
+
+.year-grid td, .year-grid th {
+  /* remove general borders */
+  border: none;
+}
+.year-grid tr:last-child td:last-child {
+  border-right: 1px dotted rgba(47,70,255,0.25);
+}
+
+/* Clean, equal header/footer, no rounding, no card background */
+.year-grid {
+  border-collapse: collapse;
+  background: transparent;
+}
+.year-grid th {
+  background: rgba(47,70,255,0.25);
+  border: none;
+  border-top: 1px dotted #2f46ff;
+}
+.year-grid tr:first-child th {
+  border-top: 1px dotted #2f46ff;
+}
+.year-grid tr:last-child td {
+  background: rgba(47,70,255,0.25);
+  border-top: 1px dotted #2f46ff;
+  border-bottom: 1px dotted #2f46ff;
+}
+
+.card { background: transparent !important; }
+
+/* Remove rounded corners from year table header */
+.year-grid th:first-child,
+.year-grid th:last-child {
+  border-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.year-grid tr:last-child td:last-child { border-right:1px dotted #2f46ff; }
+
+#addCatYearBtn {width:100%;padding:10px;border-radius:12px;border:1px dashed #2f46ff;color:#9ba4ff;background:transparent;margin:12px 0;font-size:13px;text-align:center;}
+
+/* === CATEGORY SHEET EXACT LIKE SCREENSHOT === */
+
+.sheet {
+  background: #0B0D1D;
+  padding: 20px;
+  border-radius: 22px 22px 0 0;
+}
+
+#sheetTitle {
+  font-size: 18px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+#nameInput {
+  width: 100%;
+  border-radius: 12px;
+  background: #111325;
+  font-size: 16px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.toggle-row {
+  margin-bottom: 14px;
+}
+
+#catToggleExpense, #catToggleIncome {
+  padding: 10px 0;
+  border-radius: 16px;
+  font-size: 15px;
+}
+
+#catToggleExpense.active {
+  background: #3b1b1b !important;
+  color: #ff8080 !important;
+}
+
+#catToggleIncome.active {
+  background: #1b3b20 !important;
+  color: #72ff9f !important;
+}
+
+#catStartYear {
+  width: 140px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #111325;
+  font-size: 16px;
+}
+
+.cat-year-row {
+  background: #0f1124;
+  border: 1px dashed rgba(79,105,255,0.4);
+  padding: 10px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.cat-year-col-year input,
+.cat-year-col-amount input {
+  width: 100%;
+  background: #111325;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.cat-year-col-actions .small-btn {
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+#sheetSave.sheet-btn {
+  background: #2f46ff;
+  color: white;
+  font-size: 17px;
+  padding: 14px;
+  margin-top: 20px;
+  border-radius: 14px;
+}
+
+#sheetClose.close-btn {
+  background: #111325;
+  color: #a4a7c4;
+  font-size: 16px;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 14px;
+}
+
+
+/* === CATEGORY SHEET TWEAK v39.4 === */
+
+/* Helpteksten onder startjaar en jaarblok */
+.cat-hint {
+  font-size: 11px;
+  color: #7e81a3;
+  margin-top: 4px;
+}
+
+/* Startjaar veld netjes wit en passend */
+#catStartYear {
+  background: #111325;
+  color: #ffffff;
+  border: none;
+  font-size: 16px;
+}
+
+/* Jaar + bedrag invulvakken strak, witte tekst */
+.cat-year-row {
+  background: #050716;
+  border: 1px dashed rgba(79,105,255,0.45);
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cat-year-col-year,
+.cat-year-col-amount {
+  flex: 1;
+}
+
+.cat-year-col-year input,
+.cat-year-col-amount input {
+  width: 100%;
+  background: #111325;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 16px;
+}
+
+/* Verwijder jaar direct ernaast, in één lijn */
+.cat-year-col-actions {
+  flex: 0;
+}
+
+.cat-year-col-actions .small-btn {
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+
+/* === CATEGORY SHEET TWEAK v39.5 === */
+
+/* Help texts (same as subtitle under FinFlow v39) */
+.cat-hint {
+  font-size: 12px;
+  color: #a4a7c4;
+  margin-top: 6px;
+}
+
+/* Input styling same as maand-tab */
+.cat-year-col-year input,
+.cat-year-col-amount input,
+#catStartYear,
+#nameInput {
+  background: #111325 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-size: 16px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+}
+
+/* Make amount fields show euro sign correctly (in UI they are plain, we keep that) */
+.cat-year-col-amount input::placeholder {
+  color: #7e81a3 !important;
+}
+
+/* Year rows consistent */ 
+.cat-year-row {
+  background: #050716;
+  border: 1px dashed rgba(79,105,255,0.35);
+  padding: 14px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* "Verwijder jaar" button matching layout */
+.cat-year-col-actions .small-btn {
+  background: #3b1b1b;
+  color: #ff8080;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Keep toggles consistent */
+#catToggleExpense, #catToggleIncome {
+  font-size: 15px !important;
+  padding: 10px !important;
+  border-radius: 16px !important;
+}
+
+/* Sheet save/close */
+#sheetSave.sheet-btn {
+  background: #2f46ff !important;
+  font-size: 17px !important;
+  border-radius: 14px !important;
+}
+
+#sheetClose.close-btn {
+  background: #111325 !important;
+  color: #a4a7c4 !important;
+  font-size: 16px !important;
+  border-radius: 14px !important;
+}
+
+
+/* Hide Jaar / Standaard maandbedrag header */
+.cat-year-header { display:none !important; }
+
+
+/* Inline startyear hint */
+.startyear-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#catStartYearHint {
+  font-size: 12px;
+  color: #a4a7c4;
+  white-space: nowrap;
+}
+
+
+/* v39.8: Better wrapping & alignment for hint text next to start year */
+.startyear-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+#catStartYearHint {
+  font-size: 11px !important;
+  color: #a4a7c4 !important;
+  max-width: calc(100% - 160px); /* leave space next to input */
+  white-space: normal !important;
+  line-height: 1.3;
+  margin-top: 4px;
+}
+
+/* add spacing under startyear-row to avoid touching next dashed box */
+.startyear-row + .cat-year-block {
+  margin-top: 10px !important;
+}
+
+
+/* v39.9 improved alignment */
+.startyear-row {
+  display: flex;
+  align-items: center; /* align label + input */
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+#catStartYear {
+  margin-right: 8px;
+}
+
+#catStartYearHint {
+  font-size: 11px !important;
+  color: #a4a7c4 !important;
+  max-width: 50%;
+  line-height: 1.3;
+  white-space: normal !important;
+}
+
+.startyear-row + .cat-year-block {
+  margin-top: 14px !important;
+}
+
+/* Zelfde look als categorie Startjaar */
+.startyear-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.startyear-label {
+  font-size: 14px;
+  color: #a4a7c4;
+  width: 180px;
+  display: inline-block;
+}
+
+.year-input {
+  flex: 1;
+  padding: 8px 10px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #191b30;
+  color: white;
+  box-sizing: border-box;
+}
+
+.year-input:focus {
+  outline: 2px solid #4ba7ff;
+}
+
+
+
+/* ============================================================
+   BEGIN — BREEDTE-INSTELLING BEGINSALDO VELDEN (BANK / SPAAR)
+   Pas onderstaande waardes zelf aan:
+   - width: totale breedte van het veld
+   - margin-left: verschuift het veld naar LINKS
+   Je kunt deze regels veilig aanpassen.
+   ============================================================ */
+
+#startingBankInput,
+#startingSavingsInput {
+    width: 180px !important;       /* totale breedte van veld */
+    margin-left: -08px !important; /* schuift naar links (vergroting links) */
+    max-width: none !important;
+}
+
+/* ============================================================
+   EINDE — BREEDTE-INSTELLING BEGINSALDO VELDEN
+   ============================================================ */
+
+
+/* Eén-scherm-UX: verberg de settings-kaart met beginsaldi bovenin */
+.settings-card { display:none; }
+
+.celledit-toggle-group {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.celledit-toggle-group .active {
+  background:#444;
+}
+
+.cell-month-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  justify-content:flex-start;
+}
+
+#cellEditMonthLabel { flex:1; text-align:left; }
+
+/* FORCE MONTH ROW ALIGNMENT */
+.cell-edit-grid2 {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  width: 100%;
+}
+
+.cell-edit-grid2 .startyear-label {
+  width: 120px;
+  text-align: left;
+}
+
+#cellEditMonthLabel {
+  text-align: left !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+#cellEditMonthRow { display:none; }
+
+.year-settings-icon {
+  margin-left: 0px;
+}
+
+/* I1f year nav layout */
+
+.year-title-text {
+  font-weight: 700;
+  color: #a4a7c4;
+}
+.year-settings-icon {
+  font-size: 22px;
+  opacity: 1;
+  color: #184100;
+}
+
+.edit-icon {
+    width: 14px;
+    height: 14px;
+    fill: #72ff9f;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* Verwijder numerieke pijltjes overal */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+}
+
+/* === POPUP OVERLAY === */
+.ff-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* === POPUP CONTAINER === */
+.ff-popup {
+    background: #0B0D1D;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+}
+
+/* Titel */
+.ff-popup__title {
+    font-size: 20px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+/* Input styling */
+.ff-input--number {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    background: #111325;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    margin-top: 6px;
+}
+
+/* Knoppen */
+.ff-btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.ff-btn--primary {
+    background: #2f46ff;
+    color: white;
+}
+
+.ff-btn--secondary {
+    background: #111325;
+    color: #a4a7c4;
+}
+
+/* Pijltjes verwijderen */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+/* === WIZARD POPUP – DEFINITIEVE LAYOUT (consistent met Beginsaldo-popup) === */
+
+/* Overlay volledig scherm en altijd centreren */
+.ff-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* Popup container */
+.ff-popup {
+    background: #0B0D1D;          /* zelfde kleur als jouw app */
+    border-radius: 18px;
+    padding: 24px 20px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+}
+
+/* Inhoud + spacing */
+.ff-popup__body {
+    margin-bottom: 18px;          /* ruimte onder input-gebied */
+}
+
+.ff-popup__hint {
+    margin-top: 12px;
+    margin-bottom: 18px;          /* extra ruimte voor footer */
+    line-height: 1.45;
+    color: #a4a7c4;
+    font-size: 14px;
+}
+
+/* Knoppen lay-out */
+.ff-popup__footer {
+    margin-top: 12px;
+    padding-bottom: 12px;          /* extra ruimte onder knoppen */
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.ff-btn--primary {
+    background: #2f46ff;
+    color: #fff;
+}
+
+/* Invoerveld (nummer) */
+.ff-input--number {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    background: #111325;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    margin-top: 6px;
+}
+
+/* Verwijder browser-pijltjes */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+.ff-input--negativelimit {
+    background: #fa0c0ca2 !important;  /* dezelfde roodtint als bij storting/opname toggle */
+    color: white;                     /* zodat tekst goed leesbaar blijft */
+}
+
+/* Universele fout-indicator in wizard-popups */
+.ff-error-msg {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #ff3b3b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ff-error-msg__icon {
+  width: 55px;
+  height: 55px;
+  display: inline-block;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='white'><circle cx='12' cy='12' r='10' fill='%23ff3b3b'/><path d='M8 8 L16 16 M16 8 L8 16' stroke='white' stroke-width='2'/></svg>");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* === PREMIUM POPUP FIX: boven alle andere overlays === */
+#premiumOverlay {
+  z-index: 100000 !important;
+}
+
+#premiumSheet {
+  z-index: 100001 !important;
+}
+
+.disabled-startmonth{opacity:0.6;}
+
+/* === FinFlow Welkomscherm === */
+#welcomeOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: radial-gradient(circle at top, #1f2cff 0, #050716 50%, #010109 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-modal {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  padding: 32px 24px 28px;
+  border-radius: 28px;
+  background: rgba(4, 6, 24, 0.96);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  color: #f5f7ff;
+}
+
+.welcome-logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  border-radius: 32px;
+  background: radial-gradient(circle at 30% 20%, #ffffff 0, #e3e7ff 26%, #a9b3ff 56%, #3047ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20px 40px rgba(16, 31, 255, 0.65);
+  overflow: hidden;
+}
+
+.welcome-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.welcome-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.welcome-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #b4b8d8;
+  margin-bottom: 24px;
+}
+
+.welcome-primary {
+  margin-top: 20px;
+  margin-inline: auto;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #3047ff, #5f8bff);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(47, 70, 255, 0.6);
+}
+
+.welcome-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 18px rgba(47, 70, 255, 0.75);
+}
+
+@media (max-width: 480px) {
+  .welcome-modal {
+    margin: 0 16px;
+    padding: 26px 20px 24px;
+  }
+  .welcome-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+/* ---------------------------
+   GLOBAL OVERLAY SYSTEM
+---------------------------- */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ---------------------------
+   WELCOME MODAL
+---------------------------- */
+
+.welcome-modal {
+  background: #0d0f17;
+  padding: 28px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  color: white;
+}
+
+.welcome-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+/* ---------------------------
+   YEAR SETTINGS SHEET
+---------------------------- */
+
+.sheet {
+  background: #0d0f17;
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  color: white;
+  text-align: center;
+}
+
+/* Buttons */
+.primary-btn, .secondary-btn {
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  margin: 10px 6px 0 6px;
+}
+
+.primary-btn {
+  background: #3b5bff;
+  color: white;
+}
+
+.secondary-btn {
+  background: #333;
+  color: white;
+}
+
+
+
+/* =========================
+   Fase 4 – Nieuwe NAV + TABEL look
+   ========================== */
+
+/* Jaar-navigatie in stijl van welkomstscherm */
+#yearNavContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0d0f17;
+  padding: 10px 14px;
+  border-radius: 16px;
+  margin: 8px 0 14px 0;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+  gap: 12px;
+}
+
+.year-nav-btn {
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5f7ff;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.year-nav-btn:active {
+  transform: scale(0.96);
+}
+
+#yearTitle.year-title {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+  color: #a4a7c4;
+}
+
+/* Jaar-tabel in card-stijl zoals de welcome-modal */
+.table-container {
+  margin-top: 4px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  background: #0b0d18;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.table-container thead th {
+  background: #111e3b;  /* Donkerblauwe basiskleur af */
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  color: rgba(230, 233, 255, 0.96);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.table-container tbody td {
+  padding: 8px 8px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.table-container tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.table-container tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table-container tbody tr:hover {
+  background: rgba(59, 91, 255, 0.14);
+}
+
+/* Saving-cell kolom iets centreren */
+th.saving-cell,
+td.saving-cell {
+  text-align: left;
+}
+
+/* Zorg dat popup-overlay boven tabel blijft */
+.ff-popup-overlay {
+  z-index: 9999;
+}
+
+
+/* =========================
+   Fase 5 – UI componenten
+   ========================== */
+
+.ff-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: none;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+}
+
+.ff-btn-primary {
+  background: linear-gradient(135deg, #3b5bff, #6b8bff);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(59, 91, 255, 0.45);
+}
+
+.ff-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f5f7ff;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.ff-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.ff-input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(5, 8, 18, 0.9);
+  color: #f5f7ff;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ff-input::placeholder {
+  color: rgba(200, 205, 230, 0.7);
+}
+
+.ff-input:focus {
+  border-color: #3b5bff;
+  box-shadow: 0 0 0 1px rgba(59, 91, 255, 0.5);
+}
+
+/* Zorg dat ff-popups consistent boven de rest liggen */
+.ff-popup-overlay {
+  z-index: 9999;
+}
+
+
+/* =========================
+   Fase 6 – Uniform UI dominance
+   ========================== */
+
+/* Zorg dat ff-btn styles voorkeur krijgen boven oudere button-declaraties */
+button.ff-btn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+button.ff-btn.ff-btn-primary {
+  background: linear-gradient(135deg, #3b5bff, #6b8bff);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(59, 91, 255, 0.45);
+}
+button.ff-btn.ff-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5f7ff;
+  box-shadow: none;
+}
+button.ff-btn:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================
+   Fase 7 – Popup uniformering
+   ========================== */
+
+/* Zorg dat zowel oude als nieuwe popup-klassen dezelfde stijl delen */
+.ff-popup {
+  background: #0b0d1d;
+  border-radius: 18px;
+  padding: 20px 18px 18px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.65);
+}
+
+.ff-popup-title,
+.ff-popup__title {
+  font-size: 20px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.ff-popup-text,
+.ff-popup__body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(230,233,255,0.92);
+  margin-bottom: 16px;
+}
+
+/* Actierij onder in popup */
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Knoppen in popup, koppel oude klassen aan nieuwe component-stijl */
+.popup-actions button,
+.ff-popup button.save-settings-btn {
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-size: 14px;
+}
+
+.ff-popup button.save-settings-btn {
+  background: linear-gradient(135deg, #3b5bff, #6b8bff);
+  color: #ffffff;
+  border: none;
+}
+
+/* Inputs in popup koppelen aan ff-input-stijl */
+.ff-popup input[type="number"],
+.ff-popup input[type="text"],
+.ff-popup input[type="tel"] {
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(5, 8, 18, 0.9);
+  color: #f5f7ff;
+  padding: 10px 12px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   Fase 8 – UI polish
+   ========================== */
+
+/* Algemene layout–verbeteringen */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Popup: consistente max-width, centrering en spacing */
+.ff-popup,
+.ff-popup__content {
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+  padding: 18px 18px 14px;
+}
+
+.ff-popup-title,
+.ff-popup__title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.ff-popup-text,
+.ff-popup__body {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* Popup–actions netjes uitlijnen */
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+/* Buttons in popup-actions volgen ff-btn–stijl */
+.popup-actions button,
+button.save-settings-btn {
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+/* Transitions voor hover/interactive states */
+.year-nav-btn,
+.ff-btn {
+  transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+}
+
+/* Tabel–hover nog iets subtieler */
+.table-container tbody tr:hover {
+  background: rgba(59, 91, 255, 0.18);
+}
+
+/* Kleine nav–polish */
+#yearNavContainer {
+  gap: 10px;
+}
+
+#yearTitle.year-title {
+  text-shadow: 0 0 20px rgba(59, 91, 255, 0.5);
+}
+
+/* Zorg dat overlays altijd netjes centreren op iPhone */
+.ff-popup-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* In het welkomstscherm: standaard geen enorme marge onder de tekst */
+#welcomeOverlay .welcome-modal p {
+  margin-bottom: 0 !important;
+}
+
+/* Extra ruimte tussen tekst en knop */
+#welcomeStartBtn {
+  margin-top: 22px !important; /* speel met 18–24 tot het goed voelt */
+}
+
+/* === FORCE PREMIUM STYLE FOR WELCOME BUTTON === */
+#welcomeStartBtn.ff-btn.ff-btn--primary {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-weight: 600 !important;           /* Iets vetter, premium look */
+    font-size: 16px !important;            /* Premium popup-size */
+    background: linear-gradient(135deg, #3b5bff, #6b8bff) !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    padding: 14px 26px !important;
+    box-shadow: 0 10px 26px rgba(59,91,255,0.55) !important;
+    letter-spacing: 0.015em !important;
+}
+
+/* ============================================================
+   UNIVERSELE PREMIUM HELPTekst 
+   (voor welkomstscherm én alle popups)
+   ============================================================ */
+
+.ff-helptext,
+#welcomeOverlay .welcome-modal p:not(.welcome-title),
+.ff-popup__hint,
+.ff-popup p.help,
+.ff-popup .popup-text {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+    color: #b4b8d8 !important;
+    font-weight: 400 !important;
+}
+
+/* ===== Wizard Welcome Overlay (FinFlow) ===== */
+
+.ff-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 10, 20, 0.85);
+  z-index: 900; /* boven tabel en navpil */
+}
+
+.ff-welcome-overlay.hidden {
+  display: none;
+}
+
+.ff-welcome-panel {
+  background: #0f1220;
+  border-radius: 18px;
+  padding: 24px 20px 20px;
+  max-width: 420px;
+  width: calc(100% - 40px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.ff-welcome-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.ff-welcome-text {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.ff-welcome-overlay.hidden {
+  display: none !important;
+  pointer-events: auto;
+  visibility: hidden !important;
+}
+
+.ff-welcome-overlay {
+  pointer-events: auto;
+}
+
+.ff-btn--primary {
+  background: linear-gradient(135deg, #3b5bff, #6b8bff) !important;
+  color: white !important;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+}
+
+.ff-btn--secondary {
+  background: rgba(255,255,255,0.08) !important;
+  color: #f5f7ff !important;
+}
+
+.ff-welcome-overlay.hidden,
+.overlay.hidden,
+.ff-popup-overlay.hidden {
+  pointer-events: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* FinFlow startscherm tagline onder de titel */
+.ff-welcome-tagline {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 1.05rem !important;   /* net iets kleiner dan FinFlow */
+    font-weight: 600 !important;     /* zelfde gewicht als FinFlow */
+    letter-spacing: 0.04em !important;
+    margin-top: -2px;                /* visueel mooi aansluiten */
+    margin-bottom: 16px;
+    color: #b4b8d8 !important;       /* premium subtiele kleur */
+    opacity: 0.95;
+    text-align: center;
+}
+
+/* ============================================================
+   PREMIUM: Popup-knoppen iets vetter maken in alle popups
+   ============================================================ */
+.ff-popup button,
+.ff-popup__footer button,
+.popup-actions button,
+button.ff-btn--primary,
+button.ff-btn--secondary,
+button.save-settings-btn {
+    font-weight: 600 !important;   /* iets vetter, premium gevoel */
+}
+
+/* === Beginsaldo-popup: teken-toggle + input in één rij === */
+.ff-input-sign-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+/* Maak toggle exact even hoog als het inputveld */
+.ff-input--beginsaldo {
+  height: 48px;        /* match jouw inputhoogte */
+  line-height: 48px;
+}
+
+.ff-sign-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+}
+
+/* FEL groen en rood */
+.ff-sign-toggle--positive {
+  background: #1DB954;          /* fel groen */
+  color: #071b0e;
+}
+.ff-sign-toggle--negative {
+  background: #FF3B30;          /* fel rood zoals iOS */
+  color: #2b0707;
+}
+
+.ff-sign-toggle:active { transform: translateY(1px); }
+
+/* Zorg dat input en toggle optisch op één lijn liggen */
+.ff-input-sign-row .ff-input--beginsaldo {
+  flex: 1 1 auto;
+}
+
+/* Zorg dat de nieuwe wrapper (die het jaartal en tandwiel bevat) 
+   de elementen strak op elkaar afstemt. */
+.year-and-settings-group {
+    display: inline-flex; /* Laat ze als één flex-item optreden */
+    align-items: center;
+    gap: 0;             /* Zorg dat er GEEN afstand tussen de elementen in deze groep is */
+}
+
+/* ========================================================================= */
+/* DE ABSOLUUT DEFINITIEVE, SCHONE CSS OPLOSSING VOOR NAVIGATIEPIL */
+/* (Inclusief de werkende .nav-pill-active omgebouwd naar wit) */
+/* ========================================================================= */
+
+/* ------------------------------------------------------------------------ */
+/* 💥 FIX VOOR DE HARDNEKKIGE GELE/GROENE KLEUREN UIT OUDE CSS-KLASSEN */
+/* Dit verwijdert de oude basiskleur en eventuele restkleuren in de zones. */
+/* ------------------------------------------------------------------------ */
+.nav-pill {
+    background: #111e3b !important;  /* Dwing de donkerblauwe basiskleur af */
+}
+.year-zone-left:hover, .year-zone-right:hover, .year-center:hover,
+.year-zone-left:active, .year-zone-right:active, .year-center:active {
+    background: transparent !important; /* Doodt restkleuren in de zones */
+}
+/* ------------------------------------------------------------------------ */
+
+
+/* [1] DE INNER CONTAINER (Voor Verticale Centering van alle zones) */
+.nav-pill-inner {
+    display: flex;                   /* Zet de inner container als Flexbox */
+    align-items: center;             /* CRUCIAAL: Lijn alle directe zones verticaal uit */
+    width: 100%;
+}
+
+/* [2] DE BUITENSTE PIL CONTAINER (Kleur, Vorm, Afmetingen en Layout) */
+#yearNavPill {
+    /* Layout & Afmetingen */
+    display: flex;                   
+    align-items: center;             
+    cursor: pointer;                 
+    width: 100%;                     
+    max-width: 420px;                
+    margin: 0 auto 12px auto;        
+    
+    /* KLEUR & VORM */
+    background: #111e3b;             /* KLEUR ACHTERGROND PIL (Premium Blauw) */
+    border-radius: 999px;            
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); 
+    
+    /* HOVER EFFECTEN (Basis) */
+    transition: opacity 0.1s ease-out, box-shadow 0.1s ease-out, transform 0.1s ease-out, background-color 0.1s ease-out; /* Alle animaties soepel */
+    opacity: 1.0;                    
+}
+
+/* HOVER EFFECT: DIMMEN (Muis eroverheen) */
+#yearNavPill:hover {
+    opacity: 0.85;                   /* Zorgt voor Vloeiend Dimmen bij muis over de pil */
+}
+
+/* 💥 ACTIVE EFFECT: KLIKKEN/TOUCH (DIT BLOK IS NU SIMPEL: .nav-pill-active doet het werk) */
+#yearNavPill:active {
+    /* De JS voegt de .nav-pill-active klasse toe, maar dit zorgt voor een 'klik' als de JS faalt */
+    opacity: 0.9;
+    transform: scale(0.99); /* Zeer subtiele schaalverkleining */
+}
+
+
+/* ------------------------------------------------------------------------ */
+/* [8] DE FEL WITTE KLIK-FEEDBACK (Gebruikt de door JS toegevoegde klasse) */
+/* ------------------------------------------------------------------------ */
+.nav-pill-active {
+    /* 💥 KLEURVERANDERING: Gebruik de felste kleur */
+    background: #eef2ff !important;       /* ZEER LICHTBLAUW/WIT bij klikken */
+    
+    /* 💥 CONTRAST: Omdat de pil wit wordt, moeten de pijlen/tekst donkerder */
+    color: #111e3b !important;            /* Verander tekstkleur naar donkerblauw */
+    
+    /* 💥 Druk-effect */
+    transform: scale(0.98);               /* Geeft een 'ingedrukt' gevoel, net als de oude code */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important; /* Donkerdere schaduw onder de pil */
+}
+
+
+/* [3] FLEX ZONES (Klikgebieden) */
+.year-zone-left, .year-zone-right, .year-center {
+    cursor: pointer; display: flex; align-items: center; height: 100%; flex: 1 1 0; 
+    padding: 0 10px; background: transparent !important; transition: none; 
+}
+.year-zone-left { justify-content: flex-start; }
+.year-zone-right { justify-content: flex-end; }
+.year-center { flex: 0 0 auto; justify-content: center; padding: 0 16px; height: 100%; }
+
+
+/* [4] GROEPERING JAARTAL & TANDWIEL */
+.year-and-settings-group {
+    display: inline-flex; align-items: center; gap: 0;
+}
+
+
+/* [5] TEKST INSTELLINGEN (JAARTAL) */
+#yearTitle, .year-title-text {
+    font-size: 24px;                 /* GROOTTE JAARTAL TEKST */
+    font-weight: 700;                /* VETHEID JAARTAL TEKST */
+    line-height: 1.2; 
+    color: #a4a7c4 !important;       /* KLEUR JAARTAL TEKST */
+}
+
+/* [6] BASIS STYLING VOOR ALLE ICONEN (◄, ►, ⚙) */
+.icon-btn {
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    font-size: 35px !important;      /* GROOTTE PIJLEN (Symbool) */
+    height: 60px !important;         /* HOOGTE PIJL CONTAINER */
+    width: 32px !important;          /* BREEDTE PIJL CONTAINER */
+    color: #a4a7c4 !important;       /* KLEUR PIJLEN (Wit) */
+    transform: translateY(-3px);     /* VERTICALE VERSCHUIVING PIJLEN (Negatief = omhoog) */
+    display: flex !important; align-items: center !important; justify-content: center !important; 
+    padding: 0 !important; cursor: default; pointer-events: none;
+}
+
+
+/* [7] SPECIFIEKE INSTELLINGEN VOOR ALLEEN HET TANDWIEL */
+#yearSettingsBtn {
+    font-size: 25px !important;      /* GROOTTE TANDWIEL */
+    transform: translateY(0px);      /* VERTICALE VERSCHUIVING TANDWIEL (0 = neutraal) */
+    padding-left: 10px;              /* AFSTAND JAARTAL - TANDWIEL */
+    color: inherit;                  
+    margin: 0;
+}
+
+/* Donkerblauwe achtergrond alleen voor de TOTAAL-rij */
+#yearTotalRow {
+    background: #111e3b !important;
+    font-weight: 600;
+    border-top: 2px solid #1d2c75;
+    color: #f5f7ff;
+}
+
+#yearTotalRow td {
+    padding: 09px 8px !important;   /* zelfde hoogte als de maand-rijen */
+    font-size: 13px !important;    /* exact dezelfde fontsize */
+}
+
+#yearTotalRow td {
+    border-top: 2px solid #1d2c75;
+    border-bottom: 2px solid #1d2c75;
+}
+
+/* Voeg deze CSS toe aan app.css om knoppen in kolommen te stijlen */
+.btn-group-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Ruimte tussen de knoppen */
+    margin-top: 10px; /* Ruimte onder de header */
+    margin-bottom: 20px; /* Ruimte boven de footer of de onderkant van de sheet */
+}
+
+
+/* Jaar-tabel: bedragen + edit iconen */
+.ff-cell-edit{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.ff-edit-icon{
+  opacity:0.85;
+  font-size:14px;
+  line-height:1;
+  transform: translateY(-1px);
+}
+.ff-total-cell{
+  font-weight:700;
+}
+.ff-amount-positive{
+  color:#1DB954; /* fel groen */
+}
+.ff-amount-negative{
+  color:#F44336; /* fel rood */
+}
+
+/* ---- [8] NIEUWE STIJL VOOR KLEUREN EN ICONEN (Fix voor "geen kleur" en "geen potlood") ---- */
+
+/* 1. KLEURKLASSEN VOOR BEDRAGEN */
+.ff-amount-positive,
+.ff-total-cell.ff-amount-positive { 
+    color: #72ff9f !important; /* Groen */
+}
+
+.ff-amount-negative,
+.ff-total-cell.ff-amount-negative {
+    color: #ff8080 !important; /* Rood */
+}
+
+/* === Correcte inline-edit layout zoals jouw screenshot === */
+.ff-cell-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+}
+
+.ff-edit-icon {
+    color: #72ff9f;     /* fel groen zoals screenshot */
+    font-size: 14px;
+    opacity: 0.95;
+    margin-left: 2px;
+}
+
+.ff-amount {
+    color: #f5f7ff;     /* altijd wit behalve bij banksaldo */
+}
+
+/* EINDSALDO BANK — ENIGE die rood/groen mag hebben */
+.ff-amount-positive {
+    color: #1DB954 !important;  /* groen */
+}
+
+.ff-amount-negative {
+    color: #F44336 !important;  /* rood */
+}
+
+/* EINDSALDO SPAAR — altijd wit, nooit rood/groen */
+.saving-end-cell {
+    color: #f5f7ff !important;
+}
+
+.ff-cell-edit {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+    white-space: nowrap;     /* nooit afbreken */
+}
+
+.ff-amount {
+    white-space: nowrap;
+    max-width: 95px;         /* beschermt layout bij grote bedragen */
+    overflow: hidden;
+    text-overflow: ellipsis; /* toont € 1.50… als extreem lang is */
+}
+
+.table-container td {
+    white-space: nowrap !important;
+}
+
+.ff-cell-edit {
+    min-width: fit-content;
+    white-space: nowrap !important;
+}
+

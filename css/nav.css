@@ -1,0 +1,187 @@
+/* scripts/css/components.css - Reusable UI Elements (Cards, Buttons, Summaries) */
+
+/* Cards */
+.card {
+  background:#0b0d1d;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+.card-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.card-left {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.card-title {
+  font-size:14px;
+}
+.card-amount {
+  font-size:16px;
+  font-weight:600;
+}
+.card-type {
+  font-size:11px;
+  color:#7e81a3;
+}
+.settings-card {
+  background:#050716;
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+}
+.info-text {
+  font-size:11px;
+  color:#7e81a3;
+  margin-top:4px;
+}
+
+/* Labels & Pills (Tags) */
+.label {
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+  display:inline-block;
+}
+.label.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.label.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+.pill {
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:11px;
+}
+.pill.income {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+.pill.expense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+
+/* Buttons (Generic) */
+.btn-row {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:8px;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.small-btn {
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:#111325;
+  color:#a4a7c4;
+}
+.small-btn.danger {
+  color:#ff8080;
+}
+.add-btn {
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px dashed #2f46ff;
+  color:#9ba4ff;
+  background:transparent;
+  margin-bottom:12px;
+  font-size:13px;
+}
+.primary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+.secondary-btn {
+  flex:1;
+  padding:8px 10px;
+  border-radius:12px;
+  border:none;
+  background:#111325;
+  color:#a4a7c4;
+  font-size:13px;
+}
+.saving-delete-btn {
+  font-size:11px;
+  padding:3px 6px;
+}
+.save-settings-btn {
+  width:100%;
+  margin-top:14px;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#2f46ff;
+  color:#fff;
+  font-size:13px;
+}
+
+/* FinFlow Button Standaardisatie (ff-btn) */
+button.ff-btn { 
+    all: unset; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 12px; 
+    padding: 10px 16px; 
+    font-size: 15px; 
+    font-weight: 500; 
+    cursor: pointer; 
+    box-sizing: border-box; 
+    transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+}
+.ff-btn--primary {
+    background: #3b5bff !important; 
+    color: white !important; 
+}
+.ff-btn--secondary { 
+    background: rgba(255,255,255,0.08) !important; 
+    color: #f5f7ff !important; 
+}
+
+/* Summary Block */
+.section-title {
+  font-size:14px;
+  margin:10px 0 6px;
+  color:#e0e2ff;
+}
+.summary-row {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-top:2px;
+}
+.summary-label {
+  color:#a4a7c4;
+}
+.summary-value.good {
+  color:#72ff9f;
+}
+.summary-value.bad {
+  color:#ff8080;
+}
+.summary-value.neutral {
+  color:#e0e2ff;
+}
+
+/* Global input/button font-size override */
+input,button{
+  font-size:16px !important;
+}

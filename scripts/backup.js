@@ -9,7 +9,7 @@ import {
   saveCats,
   saveMonthData,
   saveSettings,
-} from "./storage.js";
+} from "./core/storage.js";
 
 export function initBackupModule(onDataChanged) {
   const exportBtn = document.getElementById("exportDataBtn");

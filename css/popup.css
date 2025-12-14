@@ -1,0 +1,359 @@
+/* scripts/css/popup.css - Overlays, Sheets, Popups, and Internal Form Styles */
+
+/* ========================================================================= */
+/* FIXES & SPACING (Van bestaande popup.css) */
+.ff-settings-popup--vertical .settings-action-group button {
+    display: flex; 
+    width: 100%; 
+    justify-content: center; 
+    align-items: center;     
+    margin-bottom: 12px;     
+}
+.ff-settings-popup--vertical .popup-footer,
+.ff-settings-popup--vertical .ff-popup__footer {
+    width: 100%;
+}
+.ff-settings-popup--vertical .popup-footer button,
+.ff-settings-popup--vertical .ff-popup__footer button {
+    display: flex; 
+    width: 100%;             
+    flex-grow: 1;            
+    justify-content: center; 
+    align-items: center;     
+    margin-bottom: 0;        
+}
+.ff-popup__header {
+    margin-bottom: 12px;
+}
+.ff-popup__body {
+    padding: 0;
+}
+.ff-popup__footer {
+    margin-top: 16px;
+}
+.ff-popup__title {
+    margin-bottom: 10px;
+}
+
+/* ========================================================================= */
+/* OUDE GENEREKE OVERLAY/SHEET STIJLEN */
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:20;
+}
+.sheet {
+  width:100%;
+  max-width:500px;
+  background:#050716;
+  border-radius:16px 16px 0 0;
+  padding:16px;
+  transform:translateY(100%);
+  transition:transform 0.25s ease-out;
+  max-height:90vh;
+  overflow-y:auto;
+}
+.sheet.show {
+  transform:translateY(0);
+}
+#sheetTitle {
+  font-size:16px;
+  margin-bottom:10px;
+}
+.close-btn,
+.sheet-btn {
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+.sheet-btn {
+  background:#2f46ff;
+  color:#fff;
+}
+.close-btn {
+  background:#111325;
+  color:#a4a7c4;
+}
+
+/* OUDE GENEREKE INPUTS IN SHEETS */
+#nameInput,
+#amountInput {
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  margin-bottom:8px;
+  font-size:14px;
+}
+#amountInput {
+  flex:1;
+}
+
+/* OUDE TOGGLES IN SHEETS */
+.toggle-row {
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.toggle-row button {
+  flex:1;
+  padding:6px 8px;
+  border-radius:999px;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+}
+#catToggleExpense {
+  background:#3b1b1b;
+  color:#ff8080;
+}
+#catToggleIncome {
+  background:#1b3b20;
+  color:#72ff9f;
+}
+
+/* Inline Input (used in Month edit and sometimes in sheets) */
+.inline-input {
+  width:100%;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+  font-size:13px;
+}
+
+/* Form Styling within sheets (Savings/Settings) */
+.toggle-saving {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+.year-saving-toggle {
+  height:36px;
+  padding:0 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:#4ba7ff;
+}
+.saving-form {
+  margin-top:8px;
+  margin-bottom:12px;
+}
+.saving-actions {
+  justify-content:space-between;
+  margin-top:10px;
+}
+.startyear-row {
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.startyear-label {
+  font-size:14px;
+  color:#a4a7c4;
+}
+#catStartYear {
+  width:140px;
+  height:36px;
+  padding:6px 8px;
+  border-radius:8px;
+  border:none;
+  background:#111325;
+  color:#fff;
+}
+.saving-input-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+.year-saving-row { 
+  display:flex; 
+  gap:6px; 
+  flex-wrap:nowrap; 
+  align-items:center; 
+  margin-top:12px;
+}
+.year-saving-input {
+  flex:1;
+  height:36px;
+  padding:8px 10px;
+  border:none;
+  border-radius:8px;
+  background:#191b30;
+  color:white;
+  box-sizing:border-box;
+  font-size:14px !important;
+}
+.year-saving-toggle-group {
+  display:flex;
+  gap:6px;
+}
+.euro-label {
+  font-size:13px;
+  color:#a4a7c4;
+  display:flex;
+  align-items:center;
+}
+#savingsList {
+  margin-top:10px;
+}
+#startingBankInput, #startingSavingsInput, #monthlySavingAmount { 
+  font-size:14px !important; 
+}
+
+
+/* ========================================================================= */
+/* NIEUWE, UNIFORME POPUP STIJLEN (ff-popup) */
+
+/* === POPUP OVERLAY === */ 
+.ff-popup-overlay { 
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.65); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 9999; 
+    padding: 16px;
+} 
+.ff-welcome-overlay.hidden, .overlay.hidden, .ff-popup-overlay.hidden { 
+    pointer-events: none !important; 
+    opacity: 0 !important; 
+    visibility: hidden !important; 
+}
+#premiumOverlay { 
+    z-index: 100000 !important; 
+} 
+#premiumSheet { 
+    z-index: 100001 !important; 
+} 
+
+/* === WELKOMSCHERM === */
+#welcomeOverlay { 
+    position: fixed; 
+    inset: 0; 
+    z-index: 12000; 
+    background: radial-gradient(circle at top, #1f2cff 0, #050716 50%, #010109 100%); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+} 
+.welcome-modal { 
+    max-width: 400px; 
+    width: 90%; 
+    padding: 30px 20px; 
+    border-radius: 16px; 
+    text-align: center; 
+    background: #0b0d1d; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+}
+.ff-welcome-tagline { 
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important; 
+    font-size: 1.05rem !important; 
+    font-weight: 600 !important; 
+    letter-spacing: 0.04em !important; 
+    margin-top: -2px; 
+    margin-bottom: 16px; 
+    color: #b4b8d8 !important; 
+    opacity: 0.95;
+}
+
+/* === POPUP CONTAINER === */ 
+.ff-popup { 
+    background: #0B0D1D; 
+    border-radius: 16px; 
+    padding: 20px; 
+    max-width: 420px; 
+    width: 90%; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45); 
+} 
+
+/* Input styling */ 
+.ff-input--number { 
+    width: 100%; 
+    padding: 10px 12px; 
+    font-size: 16px; 
+    background: #111325; 
+    border: none; 
+    border-radius: 10px; 
+    color: white; 
+    margin-top: 6px; 
+} 
+.ff-input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(8, 18, 28, 0.9);
+    color: #f5f7ff;
+    padding: 10px 12px;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+}
+.ff-input::placeholder { 
+    color: rgba(200, 205, 230, 0.7); 
+} 
+.ff-input:focus { 
+    border-color: #3b5bff; 
+    box-shadow: 0 0 0 1px rgba(59, 91, 255, 0.5); 
+} 
+
+/* Knoppenrijen */ 
+.popup-actions { 
+    display: flex; 
+    gap: 10px; 
+    justify-content: flex-end; 
+    margin-top: 14px; 
+} 
+.popup-actions button, button.save-settings-btn { 
+    border-radius: 12px; 
+    padding: 8px 14px; 
+    font-size: 14px; 
+} 
+
+/* Category-specifieke stijlen in popups/sheets */
+.disabled-startmonth{opacity:0.6;} 
+.cat-year-row { 
+    background: #050716; 
+    border: 1px dashed rgba(79,105,255,0.45); 
+    padding: 12px; 
+    border-radius: 16px; 
+    margin-bottom: 8px; 
+    display: flex; 
+    gap: 8px; 
+    align-items: center; 
+} 
+.cat-year-col-year, .cat-year-col-amount { 
+    flex: 1; 
+} 
+.cat-year-col-year input, .cat-year-col-amount input { 
+    width: 100%; 
+    background: #111325; 
+    color: #ffffff; 
+    border: none; 
+    border-radius: 10px; 
+    padding: 10px 12px; 
+    font-size: 16px; 
+} 
+.startyear-row + .cat-year-block { 
+    margin-top: 14px !important; 
+}
