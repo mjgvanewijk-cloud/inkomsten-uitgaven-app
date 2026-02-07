@@ -16,6 +16,11 @@
     .box { background: #f6f6f7; border-radius: 12px; padding: 14px 16px; }
     .divider { margin: 28px 0; border: 0; border-top: 1px solid #e5e5ea; }
     .lang-label { font-size: 13px; color: #666; margin: 0 0 6px; text-transform: uppercase; letter-spacing: .06em; }
+      .ff-topbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e5ea; padding: 10px 12px; }
+    .ff-topbar__inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+    .ff-topbar__btn { -webkit-appearance: none; appearance: none; border: 1px solid #d1d1d6; background: #f6f6f7; color: #111; border-radius: 10px; padding: 8px 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .ff-topbar__title { font-size: 14px; color: #555; }
+
   </style>
 </head>
 <body>
@@ -103,5 +108,37 @@
   <script>
     document.getElementById("lastUpdated").textContent = "2026-02-04";
   </script>
+
+  <script>
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search || "");
+      if (params.get("from") !== "finflow") return;
+
+      var bar = document.createElement("div");
+      bar.className = "ff-topbar";
+      bar.innerHTML = '<div class="ff-topbar__inner">' +
+        '<button type="button" class="ff-topbar__btn" id="ffBackBtn">Terug naar FinFlow / Back to FinFlow</button>' +
+        '<span class="ff-topbar__title">Privacybeleid / Privacy Policy</span>' +
+      '</div>';
+
+      document.body.insertBefore(bar, document.body.firstChild);
+
+      var btn = document.getElementById("ffBackBtn");
+      if (!btn) return;
+
+      btn.addEventListener("click", function () {
+        // Best effort: go back to the app view
+        if (window.history && window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+        // Fallback: go to app root (privacy.html lives in /lang/)
+        window.location.href = "../index.html";
+      });
+    } catch (e) {}
+  })();
+  </script>
+
 </body>
 </html>
